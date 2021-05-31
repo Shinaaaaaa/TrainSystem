@@ -131,13 +131,12 @@ void Train_System::releaseTrain(const Train &t) {
     if (t.IsRelease == 1) throw "have released";
     Train re_t = t;
     re_t.IsRelease = 1;
-    vector<Train> te = trainID_BPT.find(t.TrainID);
     trainID_BPT.modify(t.TrainID , t , re_t);
     std::cout << 0 << "\n";
 }
 
 void Train_System::queryTrain(const Train &t, date &d) {
-    if (d - t.SaleDate_begin <= 0 || t.SaleDate_end - d <= 0) throw "error";
+    if (d < t.SaleDate_begin || t.SaleDate_end < d) throw "error";
     vector<Train_Seat> tmp = trainSeat_BPT.find(t.TrainID);
     Train_Seat t_seat = tmp[0];
 

@@ -6,13 +6,12 @@
 #define TRAINSTATION_DATE_HPP
 #include <iostream>
 class date{
-private:
+public:
     int month;
     int day;
     int hour;
     int minute;
 
-public:
     date() = default;
 
     date(int M , int d , int h , int m) : month(M) , day(d) , hour(h) , minute(m) {}
@@ -52,11 +51,32 @@ public:
         return !(rhs == *this);
     }
 
-    bool operator<(const date &d) const{
-        if (month != d.month) return month < d.month;
-        else if (day != d.day) return day < d.day;
-        else if (hour != d.hour) return hour < d.hour;
-        else return minute < d.month;
+    bool operator<(const date &rhs) const {
+        if (month < rhs.month)
+            return true;
+        if (rhs.month < month)
+            return false;
+        if (day < rhs.day)
+            return true;
+        if (rhs.day < day)
+            return false;
+        if (hour < rhs.hour)
+            return true;
+        if (rhs.hour < hour)
+            return false;
+        return minute < rhs.minute;
+    }
+
+    bool operator>(const date &rhs) const {
+        return rhs < *this;
+    }
+
+    bool operator<=(const date &rhs) const {
+        return !(rhs < *this);
+    }
+
+    bool operator>=(const date &rhs) const {
+        return !(*this < rhs);
     }
 
     date operator+(const date &d) const{
@@ -168,6 +188,11 @@ public:
         y_minute += 60*y.hour + y.minute;
 
         return x_minute-y_minute;
+    }
+
+    friend bool cmp(const date &x, const date &y){
+        if (x.month == y.month) return x.day <= y.day;
+        return x.month < y.month;
     }
 
     void show() const{

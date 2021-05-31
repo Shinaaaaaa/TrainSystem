@@ -128,7 +128,7 @@ void ticket_System::que_BuyTicket(const String<21> &username , const Order &refu
             orderControl.delPendingOrder(o , o.No , t.first);
             Order tmpo = o;
             tmpo.changeStatus(1);
-            orderControl.modifyOrder(username , o , tmpo);
+            orderControl.modifyOrder(tmpo.Username , o , tmpo);
         }
     }
 }
@@ -148,7 +148,7 @@ vector<pair<Ticket, Ticket>> ticket_System::queryTicket(const String<40> &st , c
                 continue;
             }
             date saleend = begin_station[p1].EndDay + begin_station[p1].StartDayTime + date(0,0,0,begin_station[p1].LeaveTime);
-            if (saleend - d > 0){
+            if (cmp(d , saleend)){
                 ans.push_back(make_pair(begin_station[p1] , end_station[p2]));
             }
             p1++ ; p2++;
@@ -159,10 +159,11 @@ vector<pair<Ticket, Ticket>> ticket_System::queryTicket(const String<40> &st , c
     return ans;
 }
 
-vector<pair<pair<int , Train> , pair<Ticket , Ticket>>> ticket_System::queryTransfer(const Train &t , const String<40> &st , const String<40> &ed , const date &d , int type) {
-    vector<pair<int , int>> sort_contain;//排序用
-    vector<pair<int , pair<Ticket , Ticket>>> sort_contain2;
+vector<pair<pair<int , int> , pair<Ticket , Ticket>>> ticket_System::queryTransfer(const Train &t , const String<40> &st , const String<40> &ed , const date &d , int type) {
+    vector<pair<pair<int , int> , pair<Ticket , Ticket>>> ans;
     int start = 0;
+    int lowest = 1e9 + 7;
+    date lowestArriveTrans(0,0,0,0);
     for (int i = 1 ; i <= t.StationNum ; ++i){//枚举中转站
         if (t.Stations[i] == st) {
             start = i;
@@ -170,82 +171,117 @@ vector<pair<pair<int , Train> , pair<Ticket , Ticket>>> ticket_System::queryTran
         }
         if (start == 0) continue;
         vector<pair<Ticket , Ticket>> tmp1;
-        tmp1 = queryTicket(t.Stations[i] , ed , d);//查询中转站到ed的所有火车
+        if (t.Stations[i] != ed){
+            tmp1 = queryTicket(t.Stations[i] , ed , d);//查询中转站到ed的所有火车
+        }
         if (tmp1.empty()) continue;
         if (type == 0){//time
             for (int j = 0 ; j < tmp1.size() ; ++j){
-                date arriveTrans = t.StartDayTime + t.SaleDate_begin + date (0,0,0,t.TravelTimeSum[i] + t.StopoverTimeSum[i-1]);
-                int trainNo = d - arriveTrans;
-                arriveTrans += date (0,trainNo - 1,0,0);
-
                 Ticket trans = tmp1[j].first;
                 Ticket end = tmp1[j].second;
-                if (arriveTrans < trans.StartDay + trans.StartDayTime){
-                    int wait = calMinute(trans.StartDay + trans.StartDayTime , arriveTrans);
-                    sort_contain.push_back(make_pair(abs(t.TravelTimeSum[trans.StationNo] + t.StopoverTimeSum[trans.StationNo] - t.TravelTimeSum[start] - t.StopoverTimeSum[start] + wait + end.ArrivalTime - trans.LeaveTime) , j));
-                }
+
+                if (trans.TrainID == t.TrainID) continue;
+                date leaveStart = t.StartDayTime + t.SaleDate_begin + date (0,0,0,t.TravelTimeSum[start] + t.StopoverTimeSum[start]);
+                date arriveTrans = t.StartDayTime + t.SaleDate_begin + date (0,0,0,t.TravelTimeSum[i] + t.StopoverTimeSum[i-1]);
+                int trainNo = d - leaveStart;
+                arriveTrans += date (0,trainNo - 1,0,0);
+                leaveStart += date (0,trainNo - 1,0,0);
+
+                date Leavetrans = trans.StartDay + trans.StartDayTime + date(0, 0, 0, trans.LeaveTime);
+                date arriveEnd = trans.StartDay + trans.StartDayTime + date(0,0,0, end.ArrivalTime);
+                int trainNo2;
+                if (arriveTrans < Leavetrans) trainNo2 = 1;
                 else {
-                    if (t.StartDayTime < trans.StartDayTime){
-                        int wait = calMinute(trans.StartDayTime , t.StartDayTime);
-                        sort_contain.push_back(make_pair(abs(t.TravelTimeSum[trans.StationNo] + t.StopoverTimeSum[trans.StationNo] - t.TravelTimeSum[start] - t.StopoverTimeSum[start] + wait + end.ArrivalTime - trans.LeaveTime) , j));
-                    }
-                    else {
-                        int wait = calMinute(trans.StartDayTime + date (0,1,0,0) , t.StartDayTime);
-                        sort_contain.push_back(make_pair(abs(t.TravelTimeSum[trans.StationNo] + t.StopoverTimeSum[trans.StationNo] - t.TravelTimeSum[start] - t.StopoverTimeSum[start] + wait + end.ArrivalTime - trans.LeaveTime) , j));
+                    trainNo2 = arriveTrans - Leavetrans;//比较tmp2和tmp3的发车时间
+                    if (date(0, 0, Leavetrans.hour , Leavetrans.minute) < date (0, 0, arriveTrans.hour , arriveTrans.minute)) trainNo2++;
+                }
+                Leavetrans += date(0, trainNo2 - 1 , 0, 0);
+                arriveEnd += date(0, trainNo2 - 1 ,0,0);
+                int wait = calMinute(arriveEnd , leaveStart);
+                if (wait < lowest){
+                    lowest = wait;
+                    lowestArriveTrans = arriveTrans;
+                    ans.clear();
+                    ans.push_back(make_pair(make_pair(wait , i) , make_pair(trans , end)));
+                }
+                else if (wait == lowest){
+                    if (arriveTrans < lowestArriveTrans || lowestArriveTrans == date (0,0,0,0) ){
+                        lowestArriveTrans = arriveTrans;
+                        ans.clear();
+                        ans.push_back(make_pair(make_pair(wait , i) , make_pair(trans , end)));
                     }
                 }
             }
-            sort_contain.sort();
-            sort_contain2.push_back(make_pair(sort_contain[0].first , tmp1[sort_contain[0].second]));
         }
         else {//cost
-            Ticket trans = tmp1[i].first;
-            Ticket end = tmp1[i].second;
             for (int j = 0 ; j < tmp1.size() ; ++j){
-                sort_contain.push_back(make_pair(abs(t.PriceSum[i] - t.PriceSum[start] + end.Price - trans.Price) , j));
+                Ticket trans = tmp1[j].first;
+                Ticket end = tmp1[j].second;
+                if (trans.TrainID == t.TrainID) continue;
+                int cost = abs(t.PriceSum[i] - t.PriceSum[start] + end.Price - trans.Price);
+                if (cost < lowest) {
+                    lowest = cost;
+                    ans.clear();
+                    ans.push_back(make_pair(make_pair(cost , i) , make_pair(trans , end))) ;
+                }
             }
-            sort_contain.sort();
-            sort_contain2.push_back(make_pair(sort_contain[0].first , tmp1[sort_contain[0].second]));
         }
     }
-    sort_contain2.sort();
-    vector<pair<pair<int , Train> , pair<Ticket , Ticket>>> ans_vec;
-    if (!sort_contain2.empty()){
-        ans_vec.push_back(make_pair(make_pair(sort_contain2[0].first , t) , sort_contain2[0].second));
+    vector<pair<pair<int , int> , pair<Ticket , Ticket>>> ans_vec;
+    if (!ans.empty()){
+        ans_vec.push_back(ans[0]);
     }
     return ans_vec;
 }
 
 void ticket_System::queryTransfer(const String<40> &st , const String<40> &ed , const date &d , int type) {
     vector<Ticket> begin_station = ticket_BPT.find(st);
-    vector<pair<pair<int , Train> , pair<Ticket , Ticket>>> ans_con;
+    vector<pair<Train , pair<Ticket , Ticket>>> ans;
+    int lowest = 1e9 + 7;
+    date lowestArriveTrans(0,0,0,0);
     for (int i = 0 ; i < begin_station.size() ; ++i){
         Ticket ticket = begin_station[i];
         date salebegin = begin_station[i].StartDay + begin_station[i].StartDayTime + date(0,0,0,begin_station[i].LeaveTime);
         date saleend = begin_station[i].EndDay + begin_station[i].StartDayTime + date(0,0,0,begin_station[i].LeaveTime);
-        if (d - salebegin > 0 && saleend - d > 0){
+        if (cmp(salebegin , d) && cmp(d , saleend)){
             vector<Train> train_container = trainControl.find(ticket.TrainID);
             Train t = train_container[0];
-            vector<pair<pair<int , Train> , pair<Ticket , Ticket>>> way = queryTransfer(t , String<40> (st) , String<40> (ed) , d , type);
-            if (!way.empty()) ans_con.push_back(way[0]);
+            vector<pair<pair<int , int> , pair<Ticket , Ticket>>> way = queryTransfer(t , String<40> (st) , String<40> (ed) , d , type);
+            if (!way.empty()){
+                if (way[0].first.first < lowest){
+                    lowest = way[0].first.first;
+                    ans.clear();
+                    ans.push_back(make_pair(t , way[0].second));
+                }
+                else if (way[0].first.first == lowest && type == 0){
+                    date arriveTrans = t.StartDayTime + t.SaleDate_begin + date (0,0,0,t.TravelTimeSum[i] + t.StopoverTimeSum[i-1]);
+                    int trainNo = d - arriveTrans;
+                    arriveTrans += date (0,trainNo - 1,0,0);
+                    if (arriveTrans < lowestArriveTrans || lowestArriveTrans == date (0,0,0,0)){
+                        lowest = way[0].first.first;
+                        ans.clear();
+                        ans.push_back(make_pair(t , way[0].second));
+                    }
+                }
+            }
         }
     }
-    if (ans_con.empty()) {
+    if (ans.empty()) {
         cout << 0 << "\n";
         return;
     }
-    ans_con.sort();
-    pair<pair<int , Train> , pair<Ticket , Ticket>> answer = ans_con[0];
-    Train firstTrain = answer.first.second;
+
+    pair<Train , pair<Ticket , Ticket>> answer = ans[0];
+    Train firstTrain = answer.first;
     vector<Train> two = trainControl.find(answer.second.first.TrainID);
     Train secondTrain = two[0];
     int start , trans;
     String<40> transfer = secondTrain.Stations[answer.second.first.StationNo];
-    for (int i = 0 ; i < firstTrain.StationNum ; ++i){
+    for (int i = 1 ; i <= firstTrain.StationNum ; ++i){
         if (firstTrain.Stations[i] == st) start = i;
         else if (firstTrain.Stations[i] == transfer) trans = i;
     }
-    cout << firstTrain.TrainID << " " << st << " ";
+
     date tmp1 = firstTrain.StartDayTime; tmp1 += firstTrain.SaleDate_begin;
     date tmp2 = tmp1;//tmp2为到trans时间
     tmp2 += date(0 , 0 , 0 , firstTrain.TravelTimeSum[trans] + firstTrain.StopoverTimeSum[trans - 1]);
@@ -253,32 +289,31 @@ void ticket_System::queryTransfer(const String<40> &st , const String<40> &ed , 
     int no = d - tmp1;
     tmp1 += date(0 , no - 1 , 0 , 0);
     tmp2 += date(0 , no - 1 , 0 , 0);
+
+    cout << firstTrain.TrainID << " " << st << " ";
     tmp1.show();
     cout << " -> " << transfer << " ";
     tmp2.show();
     cout << " " << abs(firstTrain.PriceSum[trans] - firstTrain.PriceSum[start]) << " ";
     cout << trainControl.getSeatNum(firstTrain.TrainID , start , trans , no) << "\n";
 
-    int no2;
     cout << secondTrain.TrainID << " " << transfer << " ";
     date tmp3 = secondTrain.StartDayTime; tmp3 += secondTrain.SaleDate_begin;
     date tmp4 = tmp3;
     tmp3 += date (0 , 0 , 0 ,answer.second.first.LeaveTime);
     tmp4 += date (0 , 0 , 0 ,answer.second.second.ArrivalTime);
-
-    if (secondTrain.SaleDate_begin - tmp2 > 0){//在第二班车开始发车前到达trans
-        no2 = 1;
-    }
+    int no2;
+    if (tmp2 < tmp3) no2 = 1;
     else {
-        no2 = tmp2 - secondTrain.StartDayTime;
-        if (secondTrain.StartDayTime < firstTrain.StartDayTime) no2++;
+        no2 = tmp2 - tmp3;//比较tmp2和tmp3的发车时间
+        if (date(0,0, tmp3.hour , tmp3.minute) < date (0,0, tmp2.hour , tmp2.minute)) no2++;
     }
     tmp3 += date (0 , no2 - 1, 0 , 0);
     tmp4 += date (0 , no2 - 1, 0 , 0);
     tmp3.show();
     cout << " -> " << ed << " ";
     tmp4.show();
-    cout << abs(answer.second.first.Price - answer.second.second.Price) << " ";
+    cout << " " << abs(answer.second.first.Price - answer.second.second.Price) << " ";
     cout << trainControl.getSeatNum(secondTrain.TrainID , transfer , ed , no2) << "\n";
 }
 

@@ -375,7 +375,7 @@ void query_ticket(const std::string &cmd){
             }
             date salebegin = begin_station[p1].StartDay + begin_station[p1].StartDayTime + date(0,0,0,begin_station[p1].LeaveTime);
             date saleend = begin_station[p1].EndDay + begin_station[p1].StartDayTime + date(0,0,0,begin_station[p1].LeaveTime);
-            if (q_time - salebegin > 0 && saleend - q_time > 0){
+            if (cmp(salebegin , q_time) && cmp(q_time , saleend)){
                 begin_ans.push_back(begin_station[p1]);
                 end_ans.push_back(end_station[p2]);
             }
@@ -433,7 +433,7 @@ void query_ticket(const std::string &cmd){
     }
 }
 
-void query_transfer(const std::string &cmd){//time时 不对
+void query_transfer(const std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(15) , ' ');
     string Time , st , ed;
@@ -459,7 +459,6 @@ void query_transfer(const std::string &cmd){//time时 不对
         }
         else throw "error";
     }
-
     ticketControl.queryTransfer(String<40> (st) , String<40> (ed) , q_time , type);
 }
 
