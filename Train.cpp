@@ -124,6 +124,7 @@ void Train_System::deleteTrain(const String<21> &trainID) {
     Train t = exist_train[0];
     if (t.IsRelease == 1) throw "cannot delete";
     trainID_BPT.erase(trainID , t);
+    trainSeat_BPT.erase(trainID , Train_Seat (t.SeatNum));
     //to do
 }
 
@@ -132,7 +133,6 @@ void Train_System::releaseTrain(const Train &t) {
     Train re_t = t;
     re_t.IsRelease = 1;
     trainID_BPT.modify(t.TrainID , t , re_t);
-    std::cout << 0 << "\n";
 }
 
 void Train_System::queryTrain(const Train &t, date &d) {
@@ -239,6 +239,11 @@ int Train_System::addPendingOrderNum(const Train &t , int no) {
 int Train_System::getPendingOrderNum(const String<21> &trainID, int no) {
     vector<Train> tmp = trainID_BPT.find(trainID);
     return tmp[0].PendingNum[no];
+}
+
+void Train_System::restart() {
+    trainID_BPT.remake("train_BPT.dat" , "Train.dat");
+    trainSeat_BPT.remake("trainSeat_BPT.dat" , "trainSeat.dat");
 }
 
 //———————————————————————————————————————————————*****————————————————————————————————————————————————————————————————//

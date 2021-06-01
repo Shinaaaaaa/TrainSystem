@@ -77,6 +77,7 @@ public:
         trainSeat_BPT.initialize("trainSeat_BPT.dat" , "trainSeat.dat");
     }
 
+    void restart();
     vector<Train> find(const String<21> &trainID);
     vector<Train_Seat> findSeat(const String<21> &trainID);
     void addTrain(const Train &t);

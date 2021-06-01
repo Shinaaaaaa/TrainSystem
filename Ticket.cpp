@@ -82,38 +82,45 @@ void ticket_System::addTicket(const Train &t) {
 void ticket_System::buyTicket(const String<21> &username , const Train &t, const String<40> &st, const String<40> &ed, const date &d,
                          int num, int isQue , int OrderNo) {//num为车票数
     if (t.IsRelease == 0) throw "error";
-    int s = 0 , e = 0;
-    for (int i = 1 ; i <= t.StationNum ; ++i){
-        if (t.Stations[i] == st) s = i;
-        else if (t.Stations[i] == ed) e = i;
-    }
-    if (s == 0 || e == 0) throw "error";
-    date leave = t.SaleDate_begin; leave += t.StartDayTime;//leave为到st的时间
-    date arrive = leave;
-    arrive += date(0 , 0 , 0 , t.TravelTimeSum[e] + t.StopoverTimeSum[e - 1]);//arrive为到达ed的时间
-    leave += date (0 , 0 , 0 , t.TravelTimeSum[s] + t.StopoverTimeSum[s]);
-    int no = d - leave;
-    if (no <= 0 || no > t.SaleDate_end - t.SaleDate_begin) throw "error";
-    int l_ticketNum = trainControl.getSeatNum(t.TrainID , s , e , no);
-    if (l_ticketNum >= num) {
-        trainControl.modifySeat(t.TrainID , s , e , no , num);
-        cout << (t.PriceSum[e] - t.PriceSum[s]) * num << "\n";
-        Order o(OrderNo , 1 , t.TrainID , username , st , ed , leave + date(0, no - 1, 0, 0) , arrive + date(0, no - 1, 0, 0)
-                , t.PriceSum[e] - t.PriceSum[s] , no , num);
-        orderControl.addOrder(username , o);
-    }
-    else if (isQue == 0) {
-        throw "error no seat";
-    }
-    else {
-        Order o(OrderNo , 2 , t.TrainID , username , st , ed , leave + date(0, no - 1, 0, 0) , arrive + date(0, no - 1, 0, 0)
-                , t.PriceSum[e] - t.PriceSum[s] , no , num);
-        orderControl.addOrder(username , o);
+    if (num > t.SeatNum) throw "error";
+    if (cmp(t.SaleDate_begin , d) && cmp(d , t.SaleDate_end)){
+        int s = 0 , e = 0;
+        for (int i = 1 ; i <= t.StationNum ; ++i){
+            if (t.Stations[i] == st) s = i;
+            else if (t.Stations[i] == ed) e = i;
+        }
+        if (s == 0 || e == 0) throw "error";
+        if (s >= e) throw "error";
+        date leave = t.SaleDate_begin; leave += t.StartDayTime;//leave为到st的时间
+        date arrive = leave;
+        arrive += date(0 , 0 , 0 , t.TravelTimeSum[e] + t.StopoverTimeSum[e - 1]);//arrive为到达ed的时间
+        leave += date (0 , 0 , 0 , t.TravelTimeSum[s] + t.StopoverTimeSum[s]);
 
-        int pendingNum = trainControl.addPendingOrderNum(t , no);
-        orderControl.addPendingOrder(o , no , pendingNum);
-        cout << "queue\n";
+        int no = d - leave;
+        if (no <= 0 || no > t.SaleDate_end - t.SaleDate_begin) throw "error";
+        int l_ticketNum = trainControl.getSeatNum(t.TrainID , s , e , no);
+        if (l_ticketNum >= num) {
+            trainControl.modifySeat(t.TrainID , s , e , no , num);
+            long long cost = (t.PriceSum[e] - t.PriceSum[s]) * num;
+            cout << cost << "\n";
+            Order o(OrderNo , 1 , t.TrainID , username , st , ed , leave + date(0, no - 1, 0, 0) , arrive + date(0, no - 1, 0, 0)
+                    , t.PriceSum[e] - t.PriceSum[s] , no , num);
+            orderControl.addOrder(username , o);
+        }
+        else if (isQue == 0) {
+            throw "error no seat";
+        }
+        else {
+            Order o(OrderNo , 2 , t.TrainID , username , st , ed , leave + date(0, no - 1, 0, 0) , arrive + date(0, no - 1, 0, 0)
+                    , t.PriceSum[e] - t.PriceSum[s] , no , num);
+            orderControl.addOrder(username , o);
+
+            int pendingNum = trainControl.addPendingOrderNum(t , no);
+            orderControl.addPendingOrder(o , no , pendingNum);
+            cout << "queue\n";
+        }
     }
+    else throw "error";
 }
 
 void ticket_System::que_BuyTicket(const String<21> &username , const Order &refund_o) {
@@ -143,7 +150,7 @@ vector<pair<Ticket, Ticket>> ticket_System::queryTicket(const String<40> &st , c
     int p1 = 0 , p2 = 0;
     while (p1 < begin_station.size() && p2 < end_station.size()){
         if (begin_station[p1] == end_station[p2]) {
-            if (begin_station[p1].StationNo > end_station[p2].StationNo) {
+            if (begin_station[p1].StationNo >= end_station[p2].StationNo) {
                 p1++ ; p2++;
                 continue;
             }
@@ -320,4 +327,8 @@ void ticket_System::queryTransfer(const String<40> &st , const String<40> &ed , 
 vector<Ticket> ticket_System::find(const String<40> &trainID) {
     vector<Ticket> tmp = ticket_BPT.find(trainID);
     return tmp;
+}
+
+void ticket_System::restart() {
+    ticket_BPT.remake("tickets_BPT.dat" , "Ticket.dat");
 }

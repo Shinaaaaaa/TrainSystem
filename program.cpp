@@ -199,7 +199,7 @@ void add_train(std::string &cmd){
     tmp = Split(cmd.substr(10) , ' ');
     string trainID ,stations , prices , startTime , travelTimes , stopoverTimes , saleDate , type;
     int stationNum , seatNum;
-    date StartTime{} , saleStart{} , saleEnd{};
+    date StartTime{};
     for (int i = 0 ; i < tmp.size() ; i += 2){
         if (tmp[i] == "-i") trainID = tmp[i + 1];
         else if (tmp[i] == "-n"){
@@ -233,9 +233,11 @@ void add_train(std::string &cmd){
     String<40> Stations[stationNum + 1];
     int Prices[stationNum + 1] , TravelTimes[stationNum + 1] , StopoverTimes[stationNum];
     tmp.clear();
+    //处理车站
     tmp = Split(stations , '|');
     for (int i = 0 ; i < tmp.size() ; ++i) Stations[i + 1] = String<40> (tmp[i]);
     tmp.clear();
+    //处理票价
     tmp = Split(prices , '|');
     Prices[1] = 0;
     for (int i = 0 ; i < tmp.size() ; ++i){
@@ -245,8 +247,9 @@ void add_train(std::string &cmd){
         Prices[i + 2] += Prices[i + 1];
     }
     tmp.clear();
+    //处理两站之间时间
     tmp = Split(travelTimes , '|');
-    TravelTimes[1] = 0;
+    TravelTimes[0] = TravelTimes[1] = 0;
     for (int i = 0 ; i < tmp.size() ; ++i){
         stringstream in;
         in << tmp[i];
@@ -254,13 +257,16 @@ void add_train(std::string &cmd){
         TravelTimes[i + 2] += TravelTimes[i + 1];
     }
     tmp.clear();
-    tmp = Split(stopoverTimes , '|');
-    StopoverTimes[1] = 0;
-    for (int i = 0 ; i < tmp.size() ; ++i){
-        stringstream in;
-        in << tmp[i];
-        in >> StopoverTimes[i + 2];
-        StopoverTimes[i + 2] += StopoverTimes[i + 1];
+    //处理站台停留时间（只有两站的特判）
+    StopoverTimes[0] = StopoverTimes[1] = 0;
+    if (stationNum != 2){
+        tmp = Split(stopoverTimes , '|');
+        for (int i = 0 ; i < tmp.size() ; ++i){
+            stringstream in;
+            in << tmp[i];
+            in >> StopoverTimes[i + 2];
+            StopoverTimes[i + 2] += StopoverTimes[i + 1];
+        }
     }
     tmp.clear();
 
@@ -274,13 +280,14 @@ void add_train(std::string &cmd){
     in.clear();
     in << s[1] ; in >> d;
     in.clear();
-    saleStart.reset(mon , d , 0 , 0);
+    date saleStart(mon , d , 0 , 0);
     s = Split(sale_end , '-');
     in << s[0] ; in >> mon;
     in.clear();
     in << s[1] ; in >> d;
     in.clear();
-    saleEnd.reset(mon , d , 0 , 0);
+    date saleEnd(mon , d , 0 , 0);
+
     Train t(String<21> (trainID) , Stations , stationNum , seatNum , Prices , char (type[0]) , TravelTimes , StopoverTimes , StartTime , saleStart , saleEnd , 0);
     trainControl.addTrain(t);
     trainControl.addTrainSeat(String<21> (trainID) , seatNum);
@@ -297,6 +304,7 @@ void release_train(std::string &cmd){
     Train r_train = exist_train[0];
     trainControl.releaseTrain(r_train);
     ticketControl.addTicket(r_train);
+    std::cout << 0 << "\n";
 }
 
 void query_train(std::string &cmd){
@@ -359,7 +367,10 @@ void query_ticket(const std::string &cmd){
         }
         else throw "error";
     }
-
+    if (st == ed) {
+        cout << 0 << "\n";
+        return;
+    }
     vector<Ticket> begin_station = ticketControl.find(String<40> (st));
     vector<Ticket> end_station = ticketControl.find(String<40> (ed));
     begin_station.sort();
@@ -369,7 +380,7 @@ void query_ticket(const std::string &cmd){
     int p1 = 0 , p2 = 0;
     while (p1 < begin_station.size() && p2 < end_station.size()){
         if (begin_station[p1] == end_station[p2]) {
-            if (begin_station[p1].StationNo > end_station[p2].StationNo) {
+            if (begin_station[p1].StationNo >= end_station[p2].StationNo) {
                 p1++ ; p2++;
                 continue;
             }
@@ -496,8 +507,10 @@ void buy_ticket(const std::string &cmd){
         else throw "error";
     }
     if (user_Online.find(String<21> (username)) == user_Online.end()) throw "error (no login)";
+    if (num <= 0) throw "error";
     vector<Train> exist_train;
     exist_train = trainControl.find(String<21> (trainID));
+    if (exist_train.empty()) throw "error";
     int no = userControl.user_addOrder(String<21> (username));
     ticketControl.buyTicket(String<21> (username) , exist_train[0] , String<40> (st) , String<40> (ed) , time , num , isQue , no);
 }
@@ -507,8 +520,8 @@ void query_order(const std::string &cmd){
     tmp = Split(cmd.substr(12) , ' ');
     String<21> username(tmp[1]);
     if (user_Online.find(username) == user_Online.end()) throw "error";
-    vector<User> exist_user = userControl.find(username);
-    if (exist_user.empty()) throw "error";
+//    vector<User> exist_user = userControl.find(username);
+//    if (exist_user.empty()) throw "error";
     vector<Order> exist_Order = orderControl.findOrder(username);
     if (exist_Order.empty()) cout << 0 << "\n";
     else {
@@ -524,7 +537,7 @@ void refund_ticket(const std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(14) , ' ');
     string username;
-    int num;
+    int num = 1;
     for (int i = 0 ; i < tmp.size() ; i += 2){
         if (tmp[i] == "-u") username = tmp[i + 1];
         else if (tmp[i] == "-n"){
@@ -537,6 +550,7 @@ void refund_ticket(const std::string &cmd){
     vector<Order> exist_Order = orderControl.findOrder(String<21> (username));
     if (exist_Order.empty()) throw "error";
     exist_Order.sort();
+    if (num > exist_Order.size() || num <= 0) throw "error";
     Order r_order = exist_Order[exist_Order.size() - num];
     if (r_order.getStatus() == 1){
         orderControl.refundOrder(String<21> (username) , r_order);
@@ -571,31 +585,37 @@ void Run(std::string &command){
 }
 
 void Clean(){
-    fstream o;
-    o.open("users.dat" , ios::out);
-    o.close();
-    o.open("users_BPT.dat" , ios::out);
-    o.close();
-    o.open("Order_BPT.dat" , ios::out);
-    o.close();
-    o.open("Order.dat" , ios::out);
-    o.close();
-    o.open("pendingOrder_BPT.dat" , ios::out);
-    o.close();
-    o.open("pendingOrder.dat" , ios::out);
-    o.close();
-    o.open("tickets_BPT.dat" , ios::out);
-    o.close();
-    o.open("Ticket.dat" , ios::out);
-    o.close();
-    o.open("train_BPT.dat" , ios::out);
-    o.close();
-    o.open("Train.dat" , ios::out);
-    o.close();
-    o.open("trainSeat_BPT.dat" , ios::out);
-    o.close();
-    o.open("trainSeat.dat" , ios::out);
-    o.close();
+//    fstream o;
+//    o.open("users.dat" , ios::out);
+//    o.close();
+//    o.open("users_BPT.dat" , ios::out);
+//    o.close();
+//    o.open("Order_BPT.dat" , ios::out);
+//    o.close();
+//    o.open("Order.dat" , ios::out);
+//    o.close();
+//    o.open("pendingOrder_BPT.dat" , ios::out);
+//    o.close();
+//    o.open("pendingOrder.dat" , ios::out);
+//    o.close();
+//    o.open("tickets_BPT.dat" , ios::out);
+//    o.close();
+//    o.open("Ticket.dat" , ios::out);
+//    o.close();
+//    o.open("train_BPT.dat" , ios::out);
+//    o.close();
+//    o.open("Train.dat" , ios::out);
+//    o.close();
+//    o.open("trainSeat_BPT.dat" , ios::out);
+//    o.close();
+//    o.open("trainSeat.dat" , ios::out);
+//    o.close();
+    userControl.restart();
+    ticketControl.restart();
+    trainControl.restart();
+    orderControl.restart();
+    user_Online.clear();
+    cout << 0 << endl;
 }
 
 void Exit(){

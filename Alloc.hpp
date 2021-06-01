@@ -116,6 +116,20 @@ namespace RA {
             file.close();
         }
 
+        void clear() {
+            cache_map.clear();
+            cache_size = 0;
+            Binary_Node *ptr = head;
+            while (ptr) {
+                //清空缓存，不需要读进去
+                Binary_Node *tmp = ptr;
+                ptr = ptr->next;
+                delete tmp;
+            }
+            head = tail = nullptr;
+            file.close();
+        }
+
         void initialize(const string &filename) {
             fstream test;
             test.open(filename);
@@ -169,8 +183,8 @@ namespace RA {
                 }
             }
             else {
-                file.seekp(info_address);
-                file.write(reinterpret_cast<const char *>(&internInfo), sizeof(internInfo));
+            file.seekp(info_address);
+            file.write(reinterpret_cast<const char *>(&internInfo), sizeof(internInfo));
             }
         }
     };

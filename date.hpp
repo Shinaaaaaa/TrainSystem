@@ -190,7 +190,7 @@ public:
         return x_minute-y_minute;
     }
 
-    friend bool cmp(const date &x, const date &y){
+    friend bool cmp(const date &x, const date &y){//用于判断日期是否在范围内
         if (x.month == y.month) return x.day <= y.day;
         return x.month < y.month;
     }

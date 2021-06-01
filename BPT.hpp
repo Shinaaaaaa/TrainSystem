@@ -710,6 +710,21 @@ namespace RA {
             dataFile.write_HeadInfo(data_end);
         }
 
+        void remake(const string &file1, const string &file2) {
+            //私有成员初始化
+            treeInfo.root = -1;
+            treeInfo.head = -1;
+            treeInfo.file_end = 0;
+            data_end = sizeof(int);
+            bptFile.clear();
+            dataFile.clear();
+            //清掉文件
+            ofstream c1(file1), c2(file2);
+            c1.close();
+            c2.close();
+            //重新打开
+            initialize(file1, file2);
+        }
 /*------external-interface-------------------------------------------------------------*/
         vector<Data> find(const Key &key) {
             vector<Data> rt;

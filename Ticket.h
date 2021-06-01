@@ -54,6 +54,7 @@ public:
     ticket_System(){
         ticket_BPT.initialize("tickets_BPT.dat" , "Ticket.dat");
     };
+    void restart();
     vector<Ticket> find(const String<40> &trainID);
     void addTicket(const Train &t);
     void buyTicket(const String<21> &username , const Train &t , const String<40> &st , const String<40> &ed , const date &d , int Stationnum , int isQue , int OrderNo);

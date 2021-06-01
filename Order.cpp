@@ -120,3 +120,8 @@ vector<pair<int , Order>> Order_System::findPendingOrder(const pair<String<21>, 
 void Order_System::modifyOrder(const String<21> &username, const Order &old, const Order &New) {
     userOrders_BPT.modify(username , old , New);
 }
+
+void Order_System::restart() {
+    userOrders_BPT.remake("Order_BPT.dat" , "Order.dat");
+    pendingOrder.remake("pendingOrder_BPT.dat" , "pendingOrder.dat");
+}

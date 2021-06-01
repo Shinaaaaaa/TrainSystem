@@ -40,6 +40,7 @@ public:
     user_System(){
         username_BPT.initialize("users_BPT.dat" , "users.dat");
     }
+    void restart();
     vector<User> find(const String<21> &username);
     bool empty();
     void add_user(User &u);

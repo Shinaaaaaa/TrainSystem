@@ -93,3 +93,7 @@ int user_System::user_addOrder(const String<21> &username) {
     username_BPT.modify(username , u , tmp);
     return tmp.TotalOrder;
 }
+
+void user_System::restart() {
+    username_BPT.remake("users_BPT.dat" , "users.dat");
+}
