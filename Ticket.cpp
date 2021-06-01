@@ -245,7 +245,7 @@ void ticket_System::queryTransfer(const String<40> &st , const String<40> &ed , 
     vector<Ticket> begin_station = ticket_BPT.find(st);
     vector<pair<Train , pair<Ticket , Ticket>>> ans;
     int lowest = 1e9 + 7;
-    date lowestArriveTrans(0,0,0,0);
+    int lowestFirstTrainTime = 1e9 + 7;
     for (int i = 0 ; i < begin_station.size() ; ++i){
         Ticket ticket = begin_station[i];
         date salebegin = begin_station[i].StartDay + begin_station[i].StartDayTime + date(0,0,0,begin_station[i].LeaveTime);
@@ -257,15 +257,14 @@ void ticket_System::queryTransfer(const String<40> &st , const String<40> &ed , 
             if (!way.empty()){
                 if (way[0].first.first < lowest){
                     lowest = way[0].first.first;
+                    lowestFirstTrainTime = t.TravelTimeSum[way[0].first.second] + t.StopoverTimeSum[way[0].first.second - 1] - t.TravelTimeSum[ticket.StationNo] + t.StopoverTimeSum[ticket.StationNo];
                     ans.clear();
                     ans.push_back(make_pair(t , way[0].second));
                 }
                 else if (way[0].first.first == lowest && type == 0){
-                    date arriveTrans = t.StartDayTime + t.SaleDate_begin + date (0,0,0,t.TravelTimeSum[i] + t.StopoverTimeSum[i-1]);
-                    int trainNo = d - arriveTrans;
-                    arriveTrans += date (0,trainNo - 1,0,0);
-                    if (arriveTrans < lowestArriveTrans || lowestArriveTrans == date (0,0,0,0)){
-                        lowest = way[0].first.first;
+                    int FirstTrainTime = t.TravelTimeSum[way[0].first.second] + t.StopoverTimeSum[way[0].first.second - 1] - t.TravelTimeSum[ticket.StationNo] + t.StopoverTimeSum[ticket.StationNo];
+                    if (FirstTrainTime < lowestFirstTrainTime){
+                        lowestFirstTrainTime = t.TravelTimeSum[way[0].first.second] + t.StopoverTimeSum[way[0].first.second - 1] - t.TravelTimeSum[ticket.StationNo] + t.StopoverTimeSum[ticket.StationNo];
                         ans.clear();
                         ans.push_back(make_pair(t , way[0].second));
                     }
