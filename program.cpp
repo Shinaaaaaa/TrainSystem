@@ -395,10 +395,10 @@ void query_ticket(const std::string &cmd){
         else if (begin_station[p1] < end_station[p2]) p1++;
         else p2++;
     }
-    vector<pair<int , int>> ans_container;
+    vector<pair<pair<int , String<21>> , int>> ans_container;
     if (type == 0){//time
         for (int i = 0 ; i < begin_ans.size() ; ++i){
-            ans_container.push_back(make_pair(end_ans[i].ArrivalTime - begin_ans[i].LeaveTime , i));
+            ans_container.push_back(make_pair(make_pair(end_ans[i].ArrivalTime - begin_ans[i].LeaveTime , begin_ans[i].TrainID) , i));
         }
         ans_container.sort();
         cout << ans_container.size() << "\n";
@@ -421,7 +421,7 @@ void query_ticket(const std::string &cmd){
     }
     else {//cost
         for (int i = 0 ; i < begin_ans.size() ; ++i){
-            ans_container.push_back(make_pair(end_ans[i].Price - begin_ans[i].Price , i));
+            ans_container.push_back(make_pair(make_pair(end_ans[i].Price - begin_ans[i].Price , begin_ans[i].TrainID) , i));
         }
         ans_container.sort();
         cout << ans_container.size() << "\n";
