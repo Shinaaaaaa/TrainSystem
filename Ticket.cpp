@@ -88,8 +88,8 @@ void ticket_System::buyTicket(const String<21> &username , const Train &t, const
         if (t.Stations[i] == st) s = i;
         else if (t.Stations[i] == ed) e = i;
     }
-    date salebegin = t.SaleDate_begin + t.StartDayTime + date(0,0,0,t.TravelTimeSum[s] + t.TravelTimeSum[s]);
-    date saleend = t.SaleDate_end + t.StartDayTime + date(0,0,0,t.TravelTimeSum[s] + t.TravelTimeSum[s]);
+    date salebegin = t.SaleDate_begin + t.StartDayTime + date(0,0,0,t.TravelTimeSum[s] + t.StopoverTimeSum[s]);
+    date saleend = t.SaleDate_end + t.StartDayTime + date(0,0,0,t.TravelTimeSum[s] + t.StopoverTimeSum[s]);
     if (cmp(salebegin , d) && cmp(d , saleend)){
         if (s == 0 || e == 0) throw "error";
         if (s >= e) throw "error";
