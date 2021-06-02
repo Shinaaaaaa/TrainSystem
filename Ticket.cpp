@@ -83,12 +83,14 @@ void ticket_System::buyTicket(const String<21> &username , const Train &t, const
                          int num, int isQue , int OrderNo) {//num为车票数
     if (t.IsRelease == 0) throw "error";
     if (num > t.SeatNum) throw "error";
-    if (cmp(t.SaleDate_begin , d) && cmp(d , t.SaleDate_end)){
-        int s = 0 , e = 0;
-        for (int i = 1 ; i <= t.StationNum ; ++i){
-            if (t.Stations[i] == st) s = i;
-            else if (t.Stations[i] == ed) e = i;
-        }
+    int s = 0 , e = 0;
+    for (int i = 1 ; i <= t.StationNum ; ++i){
+        if (t.Stations[i] == st) s = i;
+        else if (t.Stations[i] == ed) e = i;
+    }
+    date salebegin = t.SaleDate_begin + t.StartDayTime + date(0,0,0,t.TravelTimeSum[s] + t.TravelTimeSum[s]);
+    date saleend = t.SaleDate_end + t.StartDayTime + date(0,0,0,t.TravelTimeSum[s] + t.TravelTimeSum[s]);
+    if (cmp(salebegin , d) && cmp(d , saleend)){
         if (s == 0 || e == 0) throw "error";
         if (s >= e) throw "error";
         date leave = t.SaleDate_begin; leave += t.StartDayTime;//leave为到st的时间
