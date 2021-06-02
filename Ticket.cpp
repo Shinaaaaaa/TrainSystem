@@ -157,7 +157,7 @@ vector<pair<Ticket, Ticket>> ticket_System::queryTicket(const String<40> &st , c
                 continue;
             }
             date saleend = begin_station[p1].EndDay + begin_station[p1].StartDayTime + date(0,0,0,begin_station[p1].LeaveTime);
-            if (cmp(d , saleend)){
+            if (d <= saleend){
                 ans.push_back(make_pair(begin_station[p1] , end_station[p2]));
             }
             p1++ ; p2++;
@@ -181,7 +181,11 @@ vector<pair<pair<int , int> , pair<Ticket , Ticket>>> ticket_System::queryTransf
         if (start == 0) continue;
         vector<pair<Ticket , Ticket>> tmp1;
         if (t.Stations[i] != ed){
-            tmp1 = queryTicket(t.Stations[i] , ed , d);//查询中转站到ed的所有火车
+            date leaveStart = t.StartDayTime + t.SaleDate_begin + date (0,0,0,t.TravelTimeSum[start] + t.StopoverTimeSum[start]);
+            date arriveTrans = t.StartDayTime + t.SaleDate_begin + date (0,0,0,t.TravelTimeSum[i] + t.StopoverTimeSum[i-1]);
+            int trainNo = d - leaveStart;
+            arriveTrans += date (0,trainNo - 1,0,0);
+            tmp1 = queryTicket(t.Stations[i] , ed , arriveTrans);//查询中转站到ed的所有火车
         }
         if (tmp1.empty()) continue;
         if (type == 0){//time

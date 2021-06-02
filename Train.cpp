@@ -136,25 +136,27 @@ void Train_System::releaseTrain(const Train &t) {
 }
 
 void Train_System::queryTrain(const Train &t, date &d) {
-    if (d < t.SaleDate_begin || t.SaleDate_end < d) throw "error";
-    vector<Train_Seat> tmp = trainSeat_BPT.find(t.TrainID);
-    Train_Seat t_seat = tmp[0];
+    if (cmp(t.SaleDate_begin , d) && cmp(d , t.SaleDate_end)){
+        vector<Train_Seat> tmp = trainSeat_BPT.find(t.TrainID);
+        Train_Seat t_seat = tmp[0];
 
-    int No = d - t.SaleDate_begin;
-    std::cout << t.TrainID << " " << t.Type << "\n";
-    std::cout << t.Stations[1] << " " << "xx-xx xx:xx" << " -> ";
-    (d += t.StartDayTime).show();
-    std::cout << " " << 0 << " " << t_seat.seat[No][1] << "\n"; //始发站
-    for (int i = 2 ; i < t.StationNum ; ++i){
-        std::cout << t.Stations[i] << " ";
-        (d + date(0 , 0 , 0 ,t.TravelTimeSum[i] + t.StopoverTimeSum[i - 1])).show();
-        std::cout << " -> ";
-        (d + date(0 , 0 , 0 , t.TravelTimeSum[i] + t.StopoverTimeSum[i])).show();
-        std::cout << " " << t.PriceSum[i] << " " << t_seat.seat[No][i] << "\n";
+        int No = d - t.SaleDate_begin;
+        std::cout << t.TrainID << " " << t.Type << "\n";
+        std::cout << t.Stations[1] << " " << "xx-xx xx:xx" << " -> ";
+        (d += t.StartDayTime).show();
+        std::cout << " " << 0 << " " << t_seat.seat[No][1] << "\n"; //始发站
+        for (int i = 2 ; i < t.StationNum ; ++i){
+            std::cout << t.Stations[i] << " ";
+            (d + date(0 , 0 , 0 ,t.TravelTimeSum[i] + t.StopoverTimeSum[i - 1])).show();
+            std::cout << " -> ";
+            (d + date(0 , 0 , 0 , t.TravelTimeSum[i] + t.StopoverTimeSum[i])).show();
+            std::cout << " " << t.PriceSum[i] << " " << t_seat.seat[No][i] << "\n";
+        }
+        std::cout << t.Stations[t.StationNum] << " ";
+        (d + date(0 , 0 , 0 , t.TravelTimeSum[t.StationNum] + t.StopoverTimeSum[t.StationNum - 1])).show();
+        std::cout << " -> " << "xx-xx xx:xx " << t.PriceSum[t.StationNum] << " " << "x" << "\n";
     }
-    std::cout << t.Stations[t.StationNum] << " ";
-    (d + date(0 , 0 , 0 , t.TravelTimeSum[t.StationNum] + t.StopoverTimeSum[t.StationNum - 1])).show();
-    std::cout << " -> " << "xx-xx xx:xx " << t.PriceSum[t.StationNum] << " " << "x" << "\n";
+    else throw "error";
 }
 
 
