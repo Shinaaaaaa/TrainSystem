@@ -257,14 +257,14 @@ void ticket_System::queryTransfer(const String<40> &st , const String<40> &ed , 
             if (!way.empty()){
                 if (way[0].first.first < lowest){
                     lowest = way[0].first.first;
-                    lowestFirstTrainTime = t.TravelTimeSum[way[0].first.second] + t.StopoverTimeSum[way[0].first.second - 1] - t.TravelTimeSum[ticket.StationNo] + t.StopoverTimeSum[ticket.StationNo];
+                    lowestFirstTrainTime = t.TravelTimeSum[way[0].first.second] + t.StopoverTimeSum[way[0].first.second - 1] - t.TravelTimeSum[ticket.StationNo] - t.StopoverTimeSum[ticket.StationNo];
                     ans.clear();
                     ans.push_back(make_pair(t , way[0].second));
                 }
                 else if (way[0].first.first == lowest && type == 0){
-                    int FirstTrainTime = t.TravelTimeSum[way[0].first.second] + t.StopoverTimeSum[way[0].first.second - 1] - t.TravelTimeSum[ticket.StationNo] + t.StopoverTimeSum[ticket.StationNo];
+                    int FirstTrainTime = t.TravelTimeSum[way[0].first.second] + t.StopoverTimeSum[way[0].first.second - 1] - t.TravelTimeSum[ticket.StationNo] - t.StopoverTimeSum[ticket.StationNo];
                     if (FirstTrainTime < lowestFirstTrainTime){
-                        lowestFirstTrainTime = t.TravelTimeSum[way[0].first.second] + t.StopoverTimeSum[way[0].first.second - 1] - t.TravelTimeSum[ticket.StationNo] + t.StopoverTimeSum[ticket.StationNo];
+                        lowestFirstTrainTime = t.TravelTimeSum[way[0].first.second] + t.StopoverTimeSum[way[0].first.second - 1] - t.TravelTimeSum[ticket.StationNo] - t.StopoverTimeSum[ticket.StationNo];
                         ans.clear();
                         ans.push_back(make_pair(t , way[0].second));
                     }
