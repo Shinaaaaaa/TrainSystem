@@ -170,7 +170,7 @@ vector<pair<pair<int , int> , pair<Ticket , Ticket>>> ticket_System::queryTransf
     vector<pair<pair<int , int> , pair<Ticket , Ticket>>> ans;
     int start = 0;
     int lowest = 1e9 + 7;
-    date lowestArriveTrans(0,0,0,0);
+    int lowestFirstTrainTime = 1e9 + 7;
     for (int i = 1 ; i <= t.StationNum ; ++i){//枚举中转站
         if (t.Stations[i] == st) {
             start = i;
@@ -207,13 +207,15 @@ vector<pair<pair<int , int> , pair<Ticket , Ticket>>> ticket_System::queryTransf
                 int wait = calMinute(arriveEnd , leaveStart);
                 if (wait < lowest){
                     lowest = wait;
-                    lowestArriveTrans = arriveTrans;
+                    int FirstTrainTime = t.TravelTimeSum[i] + t.StopoverTimeSum[i-1] - t.TravelTimeSum[start] - t.StopoverTimeSum[start];
+                    lowestFirstTrainTime = FirstTrainTime;
                     ans.clear();
                     ans.push_back(make_pair(make_pair(wait , i) , make_pair(trans , end)));
                 }
                 else if (wait == lowest){
-                    if (arriveTrans < lowestArriveTrans || lowestArriveTrans == date (0,0,0,0) ){
-                        lowestArriveTrans = arriveTrans;
+                    int FirstTrainTime = t.TravelTimeSum[i] + t.StopoverTimeSum[i-1] - t.TravelTimeSum[start] - t.StopoverTimeSum[start];
+                    if (FirstTrainTime < lowestFirstTrainTime){
+                        lowestFirstTrainTime = FirstTrainTime;
                         ans.clear();
                         ans.push_back(make_pair(make_pair(wait , i) , make_pair(trans , end)));
                     }
@@ -228,8 +230,18 @@ vector<pair<pair<int , int> , pair<Ticket , Ticket>>> ticket_System::queryTransf
                 int cost = abs(t.PriceSum[i] - t.PriceSum[start] + end.Price - trans.Price);
                 if (cost < lowest) {
                     lowest = cost;
+                    int FirstTrainTime = t.TravelTimeSum[i] + t.StopoverTimeSum[i-1] - t.TravelTimeSum[start] - t.StopoverTimeSum[start];
+                    lowestFirstTrainTime = FirstTrainTime;
                     ans.clear();
                     ans.push_back(make_pair(make_pair(cost , i) , make_pair(trans , end))) ;
+                }
+                else if (cost == lowest){
+                    int FirstTrainTime = t.TravelTimeSum[i] + t.StopoverTimeSum[i-1] - t.TravelTimeSum[start] - t.StopoverTimeSum[start];
+                    if (FirstTrainTime < lowestFirstTrainTime){
+                        lowestFirstTrainTime = FirstTrainTime;
+                        ans.clear();
+                        ans.push_back(make_pair(make_pair(cost , i) , make_pair(trans , end)));
+                    }
                 }
             }
         }
