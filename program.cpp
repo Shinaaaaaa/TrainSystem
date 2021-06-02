@@ -64,8 +64,6 @@ void Init(){
 }
 
 
-
-
 void add_user(std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(9) , ' ');
@@ -395,6 +393,7 @@ void query_ticket(const std::string &cmd){
         else if (begin_station[p1] < end_station[p2]) p1++;
         else p2++;
     }
+
     vector<pair<pair<int , String<21>> , int>> ans_container;
     if (type == 0){//time
         for (int i = 0 ; i < begin_ans.size() ; ++i){
@@ -554,7 +553,7 @@ void refund_ticket(const std::string &cmd){
     Order r_order = exist_Order[exist_Order.size() - num];
     if (r_order.getStatus() == 1){
         orderControl.refundOrder(String<21> (username) , r_order);
-        ticketControl.que_BuyTicket(String<21> (username) , r_order);
+        ticketControl.que_BuyTicket(String<21> (username) , r_order);//username没用
     }
     else if (r_order.getStatus() == 2){
         orderControl.refundOrder(String<21> (username) , r_order);

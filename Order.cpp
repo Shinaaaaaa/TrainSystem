@@ -10,9 +10,9 @@
 
 extern Train_System trainControl;
 
-Order::Order(int orderNo , int status, const RA::String<21> &trainId, const String<21> &username, const RA::String<40> &from, const RA::String<40> &to,
+Order::Order(int orderNo ,int pendingOrderNo , int status, const RA::String<21> &trainId, const String<21> &username, const RA::String<40> &from, const RA::String<40> &to,
              const date &leave,  const date &arrive,  int price, int no , int num)
-             : OrderNo(orderNo) , status(status), TrainID(trainId), Username(username) , From(from), To(to),
+             : OrderNo(orderNo) , PendingOrderNo(pendingOrderNo), status(status), TrainID(trainId), Username(username) , From(from), To(to),
                Arrive(arrive), Leave(leave), Price(price), No(no), Num(num) {}
 
 void Order::changeStatus(int s) {
@@ -22,6 +22,7 @@ void Order::changeStatus(int s) {
 Order &Order::operator=(const Order &o) {
     if (this == &o) return *this;
     OrderNo = o.OrderNo;
+    PendingOrderNo = o.PendingOrderNo;
     status = o.status;
     TrainID = o.TrainID;
     Username = o.Username;
@@ -37,6 +38,7 @@ Order &Order::operator=(const Order &o) {
 
 bool Order::operator==(const Order &rhs) const {
     return OrderNo == rhs.OrderNo &&
+           PendingOrderNo == rhs.PendingOrderNo &&
            status == rhs.status &&
            TrainID == rhs.TrainID &&
            Username == rhs.Username &&
@@ -95,7 +97,7 @@ void Order_System::refundOrder(const String<21> &username, const Order &o) {
         trainControl.modifySeat(o.TrainID , o.From , o.To , o.No , -o.Num);
     }
     else {
-        delPendingOrder(o , o.No , trainControl.getPendingOrderNum(o.TrainID , o.No));
+        delPendingOrder(o , o.No , o.PendingOrderNo);
     }
 }
 

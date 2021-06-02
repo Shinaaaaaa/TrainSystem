@@ -105,7 +105,7 @@ void ticket_System::buyTicket(const String<21> &username , const Train &t, const
             trainControl.modifySeat(t.TrainID , s , e , no , num);
             long long cost = (t.PriceSum[e] - t.PriceSum[s]) * num;
             cout << cost << "\n";
-            Order o(OrderNo , 1 , t.TrainID , username , st , ed , leave + date(0, no - 1, 0, 0) , arrive + date(0, no - 1, 0, 0)
+            Order o(OrderNo ,0 , 1 , t.TrainID , username , st , ed , leave + date(0, no - 1, 0, 0) , arrive + date(0, no - 1, 0, 0)
                     , t.PriceSum[e] - t.PriceSum[s] , no , num);
             orderControl.addOrder(username , o);
         }
@@ -113,11 +113,10 @@ void ticket_System::buyTicket(const String<21> &username , const Train &t, const
             throw "error no seat";
         }
         else {
-            Order o(OrderNo , 2 , t.TrainID , username , st , ed , leave + date(0, no - 1, 0, 0) , arrive + date(0, no - 1, 0, 0)
+            int pendingNum = trainControl.addPendingOrderNum(t , no);
+            Order o(OrderNo , pendingNum , 2 , t.TrainID , username , st , ed , leave + date(0, no - 1, 0, 0) , arrive + date(0, no - 1, 0, 0)
                     , t.PriceSum[e] - t.PriceSum[s] , no , num);
             orderControl.addOrder(username , o);
-
-            int pendingNum = trainControl.addPendingOrderNum(t , no);
             orderControl.addPendingOrder(o , no , pendingNum);
             cout << "queue\n";
         }
@@ -203,7 +202,7 @@ vector<pair<pair<int , int> , pair<Ticket , Ticket>>> ticket_System::queryTransf
                 date Leavetrans = trans.StartDay + trans.StartDayTime + date(0, 0, 0, trans.LeaveTime);
                 date arriveEnd = trans.StartDay + trans.StartDayTime + date(0,0,0, end.ArrivalTime);
                 int trainNo2;
-                if (arriveTrans < Leavetrans) trainNo2 = 1;
+                if (arriveTrans <= Leavetrans) trainNo2 = 1;
                 else {
                     trainNo2 = arriveTrans - Leavetrans;//比较tmp2和tmp3的发车时间
                     if (date(0, 0, Leavetrans.hour , Leavetrans.minute) < date (0, 0, arriveTrans.hour , arriveTrans.minute)) trainNo2++;
@@ -327,7 +326,7 @@ void ticket_System::queryTransfer(const String<40> &st , const String<40> &ed , 
     tmp3 += date (0 , 0 , 0 ,answer.second.first.LeaveTime);
     tmp4 += date (0 , 0 , 0 ,answer.second.second.ArrivalTime);
     int no2;
-    if (tmp2 < tmp3) no2 = 1;
+    if (tmp2 <= tmp3) no2 = 1;
     else {
         no2 = tmp2 - tmp3;//比较tmp2和tmp3的发车时间
         if (date(0,0, tmp3.hour , tmp3.minute) < date (0,0, tmp2.hour , tmp2.minute)) no2++;

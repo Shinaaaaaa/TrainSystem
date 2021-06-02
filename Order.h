@@ -12,6 +12,7 @@ using namespace RA;
 class Order{
 private:
     int OrderNo;
+    int PendingOrderNo;
     int status{}; // 1-success 2-pending 3-refunded
     String<21> TrainID;
     String<21> Username;
@@ -22,7 +23,7 @@ private:
     int Num{};
 public:
     Order() = default;
-    Order(int OrderNo , int status, const String<21> &trainId, const String<21> &username , const String<40> &from, const String<40> &to,
+    Order(int OrderNo ,int pendingOrderNo , int status, const String<21> &trainId, const String<21> &username , const String<40> &from, const String<40> &to,
           const date &leave, const date &arrive, int price, int no , int num);
     void changeStatus(int s);
 
@@ -44,6 +45,7 @@ public:
     friend class Order_System;
     friend class ticket_System;
 };
+
 
 
 class Order_System{
