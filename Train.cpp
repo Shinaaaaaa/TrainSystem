@@ -19,7 +19,7 @@ Train::Train(const String<21> &trainId, String<40> *stations, int stationNum, in
     for (int i = 2 ; i <= stationNum ; ++i) PriceSum[i] = priceSum[i];
     for (int i = 2 ; i <= stationNum ; ++i) TravelTimeSum[i] = travelTimeSum[i];
     for (int i = 2 ; i < stationNum ; ++i) StopoverTimeSum[i] = stopoverTimeSum[i];
-    for (int i = 0 ; i <= 100 ; ++i) PendingNum[i] = 0;
+    PendingNum = 0;
     IsRelease = isRelease;
 }
 
@@ -36,7 +36,7 @@ Train &Train::operator=(const Train &t) {
     for (int i = 2 ; i <= StationNum ; ++i) PriceSum[i] = t.PriceSum[i];
     for (int i = 2 ; i <= StationNum ; ++i) TravelTimeSum[i] = t.TravelTimeSum[i];
     for (int i = 2 ; i < StationNum ; ++i) StopoverTimeSum[i] = t.StopoverTimeSum[i];
-    for (int i = 0 ; i <= 100 ; ++i) PendingNum[i] = t.PendingNum[i];
+    PendingNum = t.PendingNum;
     IsRelease = t.IsRelease;
     return *this;
 }
@@ -58,11 +58,9 @@ bool Train::operator>=(const Train &rhs) const {
 }
 
 bool Train::operator==(const Train &rhs) const {
-    for (int i = 0 ; i <= 100 ; ++i) {
-        if (PendingNum[i] != rhs.PendingNum[i]) return false;
-    }
     return TrainID == rhs.TrainID &&
-           IsRelease == rhs.IsRelease;
+           IsRelease == rhs.IsRelease &&
+           PendingNum == rhs.PendingNum;
 }
 
 bool Train::operator!=(const Train &rhs) const {
@@ -161,9 +159,9 @@ void Train_Control::queryTrain(const Train &t, date &d) {
 
 int Train_Control::addPendingOrderNum(const Train &t , int no) {
     Train tmp = t;
-    tmp.PendingNum[no]++;
+    tmp.PendingNum++;
     trainID_BPT.modify(t.TrainID , t , tmp);
-    return tmp.PendingNum[no];
+    return tmp.PendingNum;
 }
 
 //TODO—————————————————about TrainSeat———————————————————//

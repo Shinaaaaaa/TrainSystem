@@ -28,7 +28,7 @@ private:
     date SaleDate_begin{};
     date SaleDate_end{};
     int IsRelease = 0;
-    int PendingNum[101] = {0};
+    int PendingNum;
 
 public:
     Train() = default;

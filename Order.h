@@ -57,7 +57,6 @@ public:
         userOrders_BPT.initialize("Order_BPT.dat" , "Order.dat");
         pendingOrder.initialize("pendingOrder_BPT.dat" , "pendingOrder.dat");//pendingOrder_BPT pair(TrainID , 班次数) —— pair(pendingNum , Order)
     }
-
     void restart();
     vector<Order> findOrder(const String<21> &username);
     vector<pair<int , Order>> findPendingOrder(const pair<String<21> , int> &t);
