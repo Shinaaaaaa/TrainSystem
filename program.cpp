@@ -15,7 +15,7 @@ Train_Control trainSystem;
 Ticket_Control ticketSystem;
 Order_Control orderSystem;
 
-extern map<String<21> , int> user_Online;
+extern map<String<21> , int> user_Online;//username —— pri: map
 
 //TODO 语句处理(含一个参数)
 vector<string> Split(const std::string &cmd , char p){
@@ -120,10 +120,11 @@ void add_user(std::string &cmd){
     }
     else {
         if (user_Online.find(String<21> (cur_user)) == user_Online.end()) throw "error (no login)";
-        vector<User> container;
-        container = userSystem.find(String<21> (cur_user));
-        User cur = container[0];
-        if (cur.getPrivilege() <= pri) throw "error (pri)";
+//        vector<User> container;
+//        container = userSystem.find(String<21> (cur_user));
+//        User cur = container[0];
+        int cur_pri = user_Online[String<21> (cur_user)];
+        if (cur_pri <= pri) throw "error (pri)";
         User u(String<21>(username) , String<31>(password) , String<20>(name) , String<31>(mailAddress) , pri , 0);
         userSystem.add_user(u);
         std::cout << 0 << "\n";
@@ -166,14 +167,15 @@ void query_profile(std::string &cmd){
     }
     if (user_Online.find(String<21> (cur_user)) == user_Online.end()) throw "error";
     vector<User> container;
-    container = userSystem.find(String<21> (cur_user));
-    if (container.empty()) throw "error";
-    User cur = container[0];
+//    container = userSystem.find(String<21> (cur_user));
+//    if (container.empty()) throw "error";
+//    User cur = container[0];
+    int cur_pri = user_Online[String<21> (cur_user)];
     container.clear();
     container = userSystem.find(String<21> (username));
     if (container.empty()) throw "error";
     User q_user = container[0];
-    if (cur.getPrivilege() > q_user.getPrivilege() || cur == q_user){
+    if (cur_pri > q_user.getPrivilege() || cur_user == username){
         userSystem.show_inf_user(q_user);
     }
     else throw "error";
@@ -199,15 +201,16 @@ void modify_profile(std::string &cmd){
     }
     if (user_Online.find(String<21> (cur_user)) == user_Online.end()) throw "error";
     vector<User> container;
-    container = userSystem.find(String<21> (cur_user));
-    if (container.empty()) throw "error";
-    User cur = container[0];
+//    container = userSystem.find(String<21> (cur_user));
+//    if (container.empty()) throw "error";
+//    User cur = container[0];
+    int cur_pri = user_Online[String<21> (cur_user)];
     container.clear();
     container = userSystem.find(String<21> (username));
     if (container.empty()) throw "error";
     User m_user = container[0];
-    if (pri != -1 && cur.getPrivilege() <= pri) throw "error";
-    if (cur.getPrivilege() > m_user.getPrivilege() || m_user == cur){
+    if (pri != -1 && cur_pri <= pri) throw "error";
+    if (cur_pri > m_user.getPrivilege() || cur_user == username){
         userSystem.modify_user(m_user , String<31> (password) , String<20> (name) , String<31> (mailAddress) , pri);
     }
     else throw "error";

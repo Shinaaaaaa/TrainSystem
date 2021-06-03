@@ -104,6 +104,7 @@ bool Train_Seat::operator!=(const Train_Seat &rhs) const {
 //TODO————————————————————————————————————Train_System类接口———————————————————————————————————————————————————————————//
 void Train_Control::restart() {
     trainID_BPT.remake("train_BPT.dat" , "Train.dat");
+    trainSeat_BPT.remake("trainSeat_BPT.dat" , "trainSeat.dat");
 }
 
 //—————————————————about Train———————————————————————//

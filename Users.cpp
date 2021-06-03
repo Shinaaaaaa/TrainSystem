@@ -69,7 +69,7 @@ void User_Control::login(const String<21> &u , const String<31> &p){
     }
     User U = user_exist[0];
     if (U.password != p) throw "wrong password";
-    user_Online.insert(make_pair(u , 1));
+    user_Online.insert(make_pair(u , U.privilege));
 }
 
 void User_Control::logout(const String<21> &u) {
@@ -88,6 +88,11 @@ void User_Control::modify_user(const User &m_user , const String<31> &p, const S
     if (n == "") tmp.name = m_user.name;
     if (m == "") tmp.mailAddress = m_user.mailAddress;
     if (pri == -1) tmp.privilege = m_user.privilege;
+    else {
+        if (user_Online.find(m_user.username) != user_Online.end()){
+            user_Online[m_user.username] = pri;
+        }
+    }
     username_BPT.modify(m_user.username , m_user , tmp);
     cout << tmp.username << " " << tmp.name << " " << tmp.mailAddress << " " << tmp.privilege << "\n";
 }
