@@ -37,39 +37,53 @@ void Run(std::string &command){
         case 'a': {
             if (command[4] == 'u') add_user(command);
             else add_train(command);
+            break;
         }
         case 'b':
             buy_ticket(command);
+            break;
         case 'c':
             Clean();
+            break;
         case 'd':
             delete_train(command);
+            break;
         case 'l':{
             if (command[3] == 'i') login(command);
             else logout(command);
+            break;
         }
         case 'm':
             modify_profile(command);
+            break;
         case 'q':{
             switch (command[9]) {
                 case 'f':
                     query_profile(command);
+                    break;
                 case 'e':
                     query_order(command);
+                    break;
                 case 'k':
                     query_ticket(command);
+                    break;
                 case 'i':
                     query_train(command);
+                    break;
                 default:
                     query_transfer(command);
+                    break;
             }
+            break;
         }
         case 'r':{
             if (command[2] == 'l') release_train(command);
             else refund_ticket(command);
+            break;
         }
         default:
             Exit();
+            break;
     }
 }
 
@@ -112,15 +126,26 @@ void add_user(std::string &cmd){
     int pri;
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
-            case 'c': cur_user = tmp[i + 1];
-            case 'u': username = tmp[i + 1];
-            case 'p': password = tmp[i + 1];
-            case 'n': name = tmp[i + 1];
-            case 'm': mailAddress = tmp[i + 1];
+            case 'c':
+                cur_user = tmp[i + 1];
+                break;
+            case 'u':
+                username = tmp[i + 1];
+                break;
+            case 'p':
+                password = tmp[i + 1];
+                break;
+            case 'n':
+                name = tmp[i + 1];
+                break;
+            case 'm':
+                mailAddress = tmp[i + 1];
+                break;
             default:{
                 stringstream in;
                 in << tmp[i + 1];
                 in >> pri;
+                break;
             }
         }
     }
@@ -146,8 +171,12 @@ void login(std::string &cmd){
     string username , password;
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
-            case 'u': username = tmp[i + 1];
-            default: password = tmp[i + 1];
+            case 'u':
+                username = tmp[i + 1];
+                break;
+            default:
+                password = tmp[i + 1];
+                break;
         }
     }
     userSystem.login(String<21> (username) , String<31> (password));
@@ -168,8 +197,12 @@ void query_profile(std::string &cmd){
     string cur_user , username;
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
-            case 'c': cur_user = tmp[i + 1];
-            default: username = tmp[i + 1];
+            case 'c':
+                cur_user = tmp[i + 1];
+                break;
+            default:
+                username = tmp[i + 1];
+                break;
         }
     }
     if (user_Online.find(String<21> (cur_user)) == user_Online.end()) throw "error";
@@ -192,15 +225,26 @@ void modify_profile(std::string &cmd){
     int pri = -1;
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
-            case 'c': cur_user = tmp[i + 1];
-            case 'u': username = tmp[i + 1];
-            case 'p': password = tmp[i + 1];
-            case 'n': name = tmp[i + 1];
-            case 'm': mailAddress = tmp[i + 1];
+            case 'c':
+                cur_user = tmp[i + 1];
+                break;
+            case 'u':
+                username = tmp[i + 1];
+                break;
+            case 'p':
+                password = tmp[i + 1];
+                break;
+            case 'n':
+                name = tmp[i + 1];
+                break;
+            case 'm':
+                mailAddress = tmp[i + 1];
+                break;
             case 'g':{
                 stringstream in;
                 in << tmp[i + 1];
                 in >> pri;
+                break;
             }
         }
     }
@@ -226,19 +270,27 @@ void add_train(std::string &cmd){
     date StartTime{};
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
-            case 'i': trainID = tmp[i + 1];
+            case 'i':
+                trainID = tmp[i + 1];
+                break;
             case 'n': {
                 stringstream in;
                 in << tmp[i + 1];
                 in >> stationNum;
+                break;
             }
             case 'm':{
                 stringstream in;
                 in << tmp[i + 1];
                 in >> seatNum;
+                break;
             }
-            case 's': stations = tmp[i + 1];
-            case 'p': prices = tmp[i + 1];
+            case 's':
+                stations = tmp[i + 1];
+                break;
+            case 'p':
+                prices = tmp[i + 1];
+                break;
             case 'x': {
                 startTime = tmp[i + 1];
                 vector<string> s = Split(startTime , ':');
@@ -248,11 +300,20 @@ void add_train(std::string &cmd){
                 in.clear();
                 in << s[1] ; in >> m;
                 StartTime.reset(0 , 0 , h , m);
+                break;
             }
-            case 't': travelTimes = tmp[i + 1];
-            case 'o': stopoverTimes = tmp[i + 1];
-            case 'd': saleDate = tmp[i + 1];
-            default: type = tmp[i + 1];
+            case 't':
+                travelTimes = tmp[i + 1];
+                break;
+            case 'o':
+                stopoverTimes = tmp[i + 1];
+                break;
+            case 'd':
+                saleDate = tmp[i + 1];
+                break;
+            default:
+                type = tmp[i + 1];
+                break;
         }
     }
     String<40> Stations[stationNum + 1];
@@ -340,7 +401,9 @@ void query_train(std::string &cmd){
     date time{};
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
-            case 'i': trainID = tmp[i + 1];
+            case 'i':
+                trainID = tmp[i + 1];
+                break;
             default: {
                 Time = tmp[i + 1];
                 vector<string> s = Split(Time , '-');
@@ -351,6 +414,7 @@ void query_train(std::string &cmd){
                 in << s[1] ; in >> d;
                 in.clear();
                 time.reset(M , d , 0 , 0);
+                break;
             }
         }
     }
@@ -376,8 +440,12 @@ void query_ticket(const std::string &cmd){
     date q_time{};
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
-            case 's': st = tmp[i + 1];
-            case 't': ed = tmp[i + 1];
+            case 's':
+                st = tmp[i + 1];
+                break;
+            case 't':
+                ed = tmp[i + 1];
+                break;
             case 'd': {
                 Time = tmp[i + 1];
                 vector<string> s = Split(Time , '-');
@@ -388,10 +456,12 @@ void query_ticket(const std::string &cmd){
                 in << s[1] ; in >> d;
                 in.clear();
                 q_time.reset(M , d , 0 , 0);
+                break;
             }
             default:{
                 if (tmp[i + 1] == "time") type = 0;
                 else type = 1;
+                break;
             }
         }
     }
@@ -481,8 +551,12 @@ void query_transfer(const std::string &cmd){
     date q_time{};
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
-            case 's': st = tmp[i + 1];
-            case 't': ed = tmp[i + 1];
+            case 's':
+                st = tmp[i + 1];
+                break;
+            case 't':
+                ed = tmp[i + 1];
+                break;
             case 'd': {
                 Time = tmp[i + 1];
                 vector<string> s = Split(Time , '-');
@@ -493,10 +567,12 @@ void query_transfer(const std::string &cmd){
                 in << s[1] ; in >> d;
                 in.clear();
                 q_time.reset(M , d , 0 , 0);
+                break;
             }
             default:{
                 if (tmp[i + 1] == "time") type = 0;
                 else type = 1;
+                break;
             }
         }
     }
@@ -511,8 +587,12 @@ void buy_ticket(const std::string &cmd){
     date time{};
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
-            case 'u': username = tmp[i + 1];
-            case 'i': trainID = tmp[i + 1];
+            case 'u':
+                username = tmp[i + 1];
+                break;
+            case 'i':
+                trainID = tmp[i + 1];
+                break;
             case 'd':{
                 Time = tmp[i + 1];
                 vector<string> s = Split(Time , '-');
@@ -523,15 +603,26 @@ void buy_ticket(const std::string &cmd){
                 in << s[1] ; in >> d;
                 in.clear();
                 time.reset(M , d , 0 , 0);
+                break;
             }
             case 'n':{
                 stringstream in;
                 in << tmp[i + 1];
                 in >> num;
+                break;
+            }
+            case 'f':{
+                st = tmp[i + 1];
+                break;
+            }
+            case 't':{
+                ed = tmp[i + 1];
+                break;
             }
             default:{
                 if (tmp[i + 1] == "false") isQue = 0;
                 else isQue = 1;
+                break;
             }
         }
     }
@@ -564,11 +655,14 @@ void refund_ticket(const std::string &cmd){
     int num = 1;
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
-            case 'u': username = tmp[i + 1];
+            case 'u':
+                username = tmp[i + 1];
+                break;
             default:{
                 stringstream in;
                 in << tmp[i + 1];
                 in >> num;
+                break;
             }
         }
     }
