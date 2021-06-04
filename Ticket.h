@@ -59,8 +59,6 @@ public:
 
     void addTicket(const Train &t);
     void buyTicket(const String<21> &username , const String<21> &trainID , const String<40> &st , const String<40> &ed , const date &d , int Stationnum , int isQue , int OrderNo);
-    vector<pair<Ticket , Ticket>> queryTransTicket(const String<40> &st , const String<40> &ed , const date &d);
-    vector<pair<pair<int , int> , pair<Ticket , Ticket>>> queryTransfer(const Train &t , const String<40> &st , const String<40> &ed , const date &d , int type);
     void queryTransfer(const String<40> &st , const String<40> &ed , const date &d , int type);
     void que_BuyTicket(const String<21> &username , const Order &refund_o);
 };
