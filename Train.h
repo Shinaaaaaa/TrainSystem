@@ -17,7 +17,7 @@ class Train{
     friend class Ticket_Control;
 private:
     String<21> TrainID;
-    String<31> Stations[101]; //stationNum项
+    String<40> Stations[101]; //stationNum项
     int StationNum = 0;
     int SeatNum = 0;
     int PriceSum[101]{}; //stationNum-1项
