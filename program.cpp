@@ -475,78 +475,7 @@ void query_ticket(const std::string &cmd){
         cout << 0 << "\n";
         return;
     }
-    vector<Ticket> begin_station = ticketSystem.find(String<40> (st));
-    vector<Ticket> end_station = ticketSystem.find(String<40> (ed));
-    begin_station.sort();
-    end_station.sort();
-
-    vector<Ticket> begin_ans , end_ans;
-    int p1 = 0 , p2 = 0;
-    while (p1 < begin_station.size() && p2 < end_station.size()){
-        if (begin_station[p1] == end_station[p2]) {
-            if (begin_station[p1].StationNo >= end_station[p2].StationNo) {
-                p1++ ; p2++;
-                continue;
-            }
-            date salebegin = begin_station[p1].SaleDate_begin + begin_station[p1].StartDayTime + date(0, 0, 0, begin_station[p1].LeaveTime);
-            date saleend = begin_station[p1].SaleDate_end + begin_station[p1].StartDayTime + date(0, 0, 0, begin_station[p1].LeaveTime);
-            if (cmp(salebegin , q_time) && cmp(q_time , saleend)){
-                begin_ans.push_back(begin_station[p1]);
-                end_ans.push_back(end_station[p2]);
-            }
-            p1++ ; p2++;
-        }
-        else if (begin_station[p1] < end_station[p2]) p1++;
-        else p2++;
-    }
-
-    vector<pair<pair<int , String<21>> , int>> ans_container;
-    if (type == 0){//time
-        for (int i = 0 ; i < begin_ans.size() ; ++i){
-            ans_container.push_back(make_pair(make_pair(end_ans[i].ArrivalTime - begin_ans[i].LeaveTime , begin_ans[i].TrainID) , i));
-        }
-        ans_container.sort();
-        cout << ans_container.size() << "\n";
-        for (int i = 0 ; i < ans_container.size() ; ++i){
-            int num =  ans_container[i].second;
-            cout << begin_ans[num].TrainID << " " << st << " ";
-            date tmp1 = begin_ans[num].SaleDate_begin; tmp1 += begin_ans[num].StartDayTime;
-            tmp1 += date(0 , 0 , 0 , begin_ans[num].LeaveTime);
-            int no = q_time - tmp1;
-            tmp1 += date(0 , no - 1 , 0 , 0);
-            tmp1.show();
-            cout << " -> " << ed << " ";
-            date tmp2 = end_ans[num].SaleDate_begin; tmp2 += end_ans[num].StartDayTime;
-            tmp2 += date(0 , 0 , 0 , end_ans[num].ArrivalTime);
-            tmp2 += date(0 , no - 1 , 0 , 0);
-            tmp2.show();
-            cout << " " << end_ans[num].Price - begin_ans[num].Price;
-            cout << " " << trainSystem.getSeatNum(begin_ans[num].TrainID , begin_ans[num].StationNo , end_ans[num].StationNo , no) << "\n";
-        }
-    }
-    else {//cost
-        for (int i = 0 ; i < begin_ans.size() ; ++i){
-            ans_container.push_back(make_pair(make_pair(end_ans[i].Price - begin_ans[i].Price , begin_ans[i].TrainID) , i));
-        }
-        ans_container.sort();
-        cout << ans_container.size() << "\n";
-        for (int i = 0 ; i < ans_container.size() ; ++i){
-            int num =  ans_container[i].second;
-            cout << begin_ans[num].TrainID << " " << st << " ";
-            date tmp1 = begin_ans[num].SaleDate_begin; tmp1 += begin_ans[num].StartDayTime;
-            tmp1 += date(0 , 0 , 0 , begin_ans[num].LeaveTime);
-            int no = q_time - tmp1;
-            tmp1 += date(0 , no - 1 , 0 , 0);
-            tmp1.show();
-            cout << " -> " << ed << " ";
-            date tmp2 = end_ans[num].SaleDate_begin; tmp2 += end_ans[num].StartDayTime;
-            tmp2 += date(0 , 0 , 0 , end_ans[num].ArrivalTime);
-            tmp2 += date(0 , no - 1 , 0 , 0);
-            tmp2.show();
-            cout << " " << end_ans[num].Price - begin_ans[num].Price;
-            cout << " " << trainSystem.getSeatNum(begin_ans[num].TrainID , begin_ans[num].StationNo , end_ans[num].StationNo , no) << "\n";
-        }
-    }
+    ticketSystem.queryTicket(String<40> (st) , String<40> (ed) , q_time , type);
 }
 
 void query_transfer(const std::string &cmd){
