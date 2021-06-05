@@ -154,7 +154,7 @@ void add_user(std::string &cmd){
     }
 
     if (userSystem.empty()) { //判断是否为第一个用户
-        User u(username , password , name , mailAddress , 10 , 0);
+        User u(username , password , name , mailAddress , 10);
         userSystem.add_user(u);
         std::cout << 0 << "\n";
     }
@@ -162,7 +162,7 @@ void add_user(std::string &cmd){
         if (user_Online.find(cur_user) == user_Online.end()) throw "error (no login)";
         int cur_pri = user_Online[cur_user];
         if (cur_pri <= pri) throw "error (pri)";
-        User u(username , password , name , mailAddress , pri , 0);
+        User u(username , password , name , mailAddress , pri);
         userSystem.add_user(u);
         std::cout << 0 << "\n";
     }
@@ -521,7 +521,7 @@ void query_ticket(const std::string &cmd){
             tmp2 += date(0 , no - 1 , 0 , 0);
             tmp2.show();
             cout << " " << end_ans[num].Price - begin_ans[num].Price;
-            cout << " " << trainSystem.getSeatNum(begin_ans[num].TrainID , String<40> (st) , String<40> (ed) , no) << "\n";
+            cout << " " << trainSystem.getSeatNum(begin_ans[num].TrainID , begin_ans[num].StationNo , end_station[num].StationNo , no) << "\n";
         }
     }
     else {//cost
@@ -544,7 +544,7 @@ void query_ticket(const std::string &cmd){
             tmp2 += date(0 , no - 1 , 0 , 0);
             tmp2.show();
             cout << " " << end_ans[num].Price - begin_ans[num].Price;
-            cout << " " << trainSystem.getSeatNum(begin_ans[num].TrainID , String<40> (st) , String<40> (ed) , no) << "\n";
+            cout << " " << trainSystem.getSeatNum(begin_ans[num].TrainID , begin_ans[num].StationNo , end_station[num].StationNo , no) << "\n";
         }
     }
 }
@@ -690,8 +690,6 @@ void refund_ticket(const std::string &cmd){
     cout << 0 << "\n";
     //更改order 更改余票信息 查看候补队列是否能够购买
 }
-
-
 
 void Clean(){
     userSystem.restart();

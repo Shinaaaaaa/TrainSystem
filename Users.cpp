@@ -9,13 +9,12 @@ map<String<21> , int> user_Online;
 //TODO———————————————————————————————————————————class  user——————————————————————————————————————————————————————————//
 User::User() = default;
 
-User::User(const String<21> &u, const String<31> &p, const String<20> &n, const String<31> &m, int pri , int totalOrder) {
+User::User(const String<21> &u, const String<31> &p, const String<20> &n, const String<31> &m, int pri) {
     username = u;
     password = p;
     name = n;
     mailAddress = m;
     privilege = pri;
-    TotalOrder = totalOrder;
 }
 
 bool User::operator==(const User &rhs) const {
@@ -23,8 +22,7 @@ bool User::operator==(const User &rhs) const {
            password == rhs.password &&
            name == rhs.name &&
            mailAddress == rhs.mailAddress &&
-           privilege == rhs.privilege &&
-           TotalOrder == rhs.TotalOrder;
+           privilege == rhs.privilege;
 }
 
 bool User::operator!=(const User &rhs) const {
@@ -39,6 +37,7 @@ int User::getPrivilege() const {
 //TODO clean时调用restart函数可以清空BPT与缓存区并重新初始化
 void User_Control::restart() {
     username_BPT.remake("users_BPT.dat" , "users.dat");
+    userOrderNum.remake("userOrderNum_BPT.dat" , "userOrderNum.dat");
 }
 
 bool User_Control::empty() {
@@ -57,6 +56,7 @@ void User_Control::add_user(User &u) {
         throw "error (existed)";
     }
     username_BPT.insert(u.username.hash_value , u);
+    userOrderNum.insert(u.username.hash_value , 0);
 }
 
 void User_Control::login(const String<21> &u , const String<31> &p){
@@ -83,7 +83,7 @@ void User_Control::show_inf_user(const User &u) {
 }
 
 void User_Control::modify_user(const User &m_user , const String<31> &p, const String<20> &n, const String<31> &m, int pri) {
-    User tmp(m_user.username , p , n , m , pri , m_user.TotalOrder);
+    User tmp(m_user.username , p , n , m , pri);
     if (p == "") tmp.password = m_user.password;
     if (n == "") tmp.name = m_user.name;
     if (m == "") tmp.mailAddress = m_user.mailAddress;
@@ -99,11 +99,9 @@ void User_Control::modify_user(const User &m_user , const String<31> &p, const S
 
 //TODO 用户购买车票后调用addOrderNum函数,其记录的订单数加一
 int User_Control::user_addOrderNum(const String<21> &username) {
-    vector<User> b_user = username_BPT.find(String<21> (username).hash_value);
-    if (b_user.empty()) throw "error";
-    User u = b_user[0];
-    User tmp = u;
-    tmp.TotalOrder++;
-    username_BPT.modify(username.hash_value , u , tmp);
-    return tmp.TotalOrder;
+    vector<int> con = userOrderNum.find(username.hash_value);
+    int Num = con[0];
+    Num++;
+    userOrderNum.modify(username.hash_value , con[0] , Num);
+    return Num;
 }

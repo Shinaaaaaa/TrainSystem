@@ -127,7 +127,7 @@ void Ticket_Control::buyTicket(const String<21> &username, const String<21> &tra
             throw "error no seat";
         }
         else {
-            int pendingNum = trainSystem.addPendingOrderNum(t , no);
+            int pendingNum = trainSystem.addPendingOrderNum(t.TrainID , no);
             Order o(OrderNo , pendingNum , 2 , t.TrainID , username , st , ed , leave + date(0, no - 1, 0, 0) , arrive + date(0, no - 1, 0, 0)
                     , t.PriceSum[e] - t.PriceSum[s] , no , num);
             orderSystem.addOrder(username , o);
@@ -144,9 +144,16 @@ void Ticket_Control::que_BuyTicket(const String<21> &username , const Order &ref
     for (int i = 0 ; i < tmp.size() ; ++i){
         pair<int , Order> t = tmp[i];
         Order o = t.second;
-        int left = trainSystem.getSeatNum(o.TrainID , o.From , o.To , o.StationNo);
+        vector<Train> con = trainSystem.findTrain(o.TrainID);
+        Train train = con[0];
+        int s = 0 , e = 0;
+        for (int j = 1 ; j <= train.StationNum ; ++i){
+            if (train.Stations[j] == o.From) s = i;
+            if (train.Stations[j] == o.To) e = i;
+        }
+        int left = trainSystem.getSeatNum(o.TrainID , s , e , o.StationNo);
         if (o.TicketNum <= left) {
-            trainSystem.modifySeat(o.TrainID , o.From , o.To , o.StationNo , o.TicketNum);
+            trainSystem.modifySeat(o.TrainID , s , e , o.StationNo , o.TicketNum);
             orderSystem.delPendingOrder(o , o.StationNo , t.first);
             Order tmpo = o;
             tmpo.changeStatus(1);

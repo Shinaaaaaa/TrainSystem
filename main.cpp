@@ -3,8 +3,8 @@
 using namespace std;
 
 int main() {
-//    freopen("data/basic_6/10.in" , "r" , stdin);
-//    freopen("data/basic_6/10ans.txt" , "w" , stdout);
+//    freopen("data/basic_6/5.in" , "r" , stdin);
+//    freopen("data/basic_6/5ans.txt" , "w" , stdout);
 
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);

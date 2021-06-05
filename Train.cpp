@@ -19,7 +19,6 @@ Train::Train(const String<21> &trainId, String<40> *stations, int stationNum, in
     for (int i = 2 ; i <= stationNum ; ++i) PriceSum[i] = priceSum[i];
     for (int i = 2 ; i <= stationNum ; ++i) TravelTimeSum[i] = travelTimeSum[i];
     for (int i = 2 ; i < stationNum ; ++i) StopoverTimeSum[i] = stopoverTimeSum[i];
-    PendingNum = 0;
     IsRelease = isRelease;
 }
 
@@ -36,7 +35,6 @@ Train &Train::operator=(const Train &t) {
     for (int i = 2 ; i <= StationNum ; ++i) PriceSum[i] = t.PriceSum[i];
     for (int i = 2 ; i <= StationNum ; ++i) TravelTimeSum[i] = t.TravelTimeSum[i];
     for (int i = 2 ; i < StationNum ; ++i) StopoverTimeSum[i] = t.StopoverTimeSum[i];
-    PendingNum = t.PendingNum;
     IsRelease = t.IsRelease;
     return *this;
 }
@@ -59,8 +57,7 @@ bool Train::operator>=(const Train &rhs) const {
 
 bool Train::operator==(const Train &rhs) const {
     return TrainID == rhs.TrainID &&
-           IsRelease == rhs.IsRelease &&
-           PendingNum == rhs.PendingNum;
+           IsRelease == rhs.IsRelease;
 }
 
 bool Train::operator!=(const Train &rhs) const {
@@ -97,6 +94,7 @@ bool Train_Seat::operator!=(const Train_Seat &rhs) const {
 void Train_Control::restart() {
     trainID_BPT.remake("train_BPT.dat" , "Train.dat");
     trainSeat_BPT.remake("trainSeat_BPT.dat" , "trainSeat.dat");
+    trainPendingNum_BPT.remake("trainPendingNum_BPT.dat" , "trainPendingNum.dat");
 }
 
 //TODO—————————————————about Train———————————————————————//
@@ -129,6 +127,7 @@ void Train_Control::releaseTrain(const Train &t) {
     trainID_BPT.modify(t.TrainID.hash_value , t , re_t);
     Train_Seat a(t.SeatNum);
     for (int i = 1 ; i <= t.SaleDate_end - t.SaleDate_begin ; ++i) trainSeat_BPT.insert(make_pair(t.TrainID , i) , a);
+    trainPendingNum_BPT.insert(t.TrainID.hash_value , 0);
 }
 
 void Train_Control::queryTrain(const Train &t, date &d) {
@@ -174,11 +173,12 @@ void Train_Control::queryTrain(const Train &t, date &d) {
     else throw "error";
 }
 
-int Train_Control::addPendingOrderNum(const Train &t , int no) {
-    Train tmp = t;
-    tmp.PendingNum++;
-    trainID_BPT.modify(t.TrainID.hash_value , t , tmp);
-    return tmp.PendingNum;
+int Train_Control::addPendingOrderNum(const String<21> &trainID  , int no) {
+    vector<int> con = trainPendingNum_BPT.find(trainID.hash_value);
+    int Num = con[0];
+    Num++;
+    trainPendingNum_BPT.modify(trainID.hash_value , con[0] , Num);
+    return Num;
 }
 
 //TODO—————————————————about TrainSeat———————————————————//

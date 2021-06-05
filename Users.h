@@ -19,11 +19,10 @@ private:
     String<20> name;
     String<31> mailAddress;
     int privilege{};
-    int TotalOrder = 0;
 
 public:
     User();
-    User(const String<21> &u , const String<31> &p , const String<20> &n, const String<31> &m , int pri , int totalOrder);
+    User(const String<21> &u , const String<31> &p , const String<20> &n, const String<31> &m , int pri);
 
     bool operator==(const User &rhs) const;
     bool operator!=(const User &rhs) const;
@@ -31,14 +30,15 @@ public:
     int getPrivilege() const;
 };
 
-
 class User_Control{
 private:
     BPlusTree<int , User> username_BPT;//username——User BPT:储存用户信息
+    BPlusTree<int , int> userOrderNum;
 
 public:
     User_Control(){
         username_BPT.initialize("users_BPT.dat" , "users.dat");
+        userOrderNum.initialize("userOrderNum_BPT.dat" , "userOrderNum.dat");
     }
     void restart();
     bool empty();
