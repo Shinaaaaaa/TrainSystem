@@ -521,7 +521,7 @@ void query_ticket(const std::string &cmd){
             tmp2 += date(0 , no - 1 , 0 , 0);
             tmp2.show();
             cout << " " << end_ans[num].Price - begin_ans[num].Price;
-            cout << " " << trainSystem.getSeatNum(begin_ans[num].TrainID , begin_ans[num].StationNo , end_station[num].StationNo , no) << "\n";
+            cout << " " << trainSystem.getSeatNum(begin_ans[num].TrainID , begin_ans[num].StationNo , end_ans[num].StationNo , no) << "\n";
         }
     }
     else {//cost
@@ -544,7 +544,7 @@ void query_ticket(const std::string &cmd){
             tmp2 += date(0 , no - 1 , 0 , 0);
             tmp2.show();
             cout << " " << end_ans[num].Price - begin_ans[num].Price;
-            cout << " " << trainSystem.getSeatNum(begin_ans[num].TrainID , begin_ans[num].StationNo , end_station[num].StationNo , no) << "\n";
+            cout << " " << trainSystem.getSeatNum(begin_ans[num].TrainID , begin_ans[num].StationNo , end_ans[num].StationNo , no) << "\n";
         }
     }
 }

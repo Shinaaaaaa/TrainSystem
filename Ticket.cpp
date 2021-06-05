@@ -147,9 +147,9 @@ void Ticket_Control::que_BuyTicket(const String<21> &username , const Order &ref
         vector<Train> con = trainSystem.findTrain(o.TrainID);
         Train train = con[0];
         int s = 0 , e = 0;
-        for (int j = 1 ; j <= train.StationNum ; ++i){
-            if (train.Stations[j] == o.From) s = i;
-            if (train.Stations[j] == o.To) e = i;
+        for (int j = 1 ; j <= train.StationNum ; ++j){
+            if (train.Stations[j] == o.From) s = j;
+            if (train.Stations[j] == o.To) e = j;
         }
         int left = trainSystem.getSeatNum(o.TrainID , s , e , o.StationNo);
         if (o.TicketNum <= left) {
