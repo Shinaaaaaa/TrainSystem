@@ -381,11 +381,8 @@ void add_train(std::string &cmd){
     in << s[1] ; in >> d;
     in.clear();
     date saleEnd(mon , d , 0 , 0);
-
     Train t(trainID , Stations , stationNum , seatNum , Prices , char (type[0]) , TravelTimes , StopoverTimes , StartTime , saleStart , saleEnd , 0);
     trainSystem.addTrain(t);
-    int dayCount = saleEnd - saleStart;
-    trainSystem.addTrainSeat(trainID , seatNum , dayCount);
     std::cout << 0 << "\n";
 }
 
@@ -702,7 +699,7 @@ void Clean(){
     trainSystem.restart();
     orderSystem.restart();
     user_Online.clear();
-    cout << 0 << endl;
+    cout << 0 << '\n';
 }
 
 void Exit(){

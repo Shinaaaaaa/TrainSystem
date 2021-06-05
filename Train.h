@@ -82,7 +82,6 @@ public:
     int addPendingOrderNum(const Train &t , int no);
 
     vector<Train_Seat> findSeat(const String<21> &trainID , int no);
-    void addTrainSeat(const String<21> &trainID , int num , int dayCount);
     int getSeatNum(const String<21> &trainID , int st , int ed , int no);
     int getSeatNum(const String<21> &trainID ,const String<40> &st , const String<40> &ed , int no);
     void modifySeat(const String<21> &trainID , int st , int ed , int no , int changeNum);
