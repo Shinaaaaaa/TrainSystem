@@ -34,7 +34,7 @@ public:
 
 class User_Control{
 private:
-    BPlusTree<int , User> username_BPT;//username——User BPT:储存用户信息
+    BPlusTree<int , User , 250 , 500> username_BPT;//username——User BPT:储存用户信息
 
 public:
     User_Control(){
