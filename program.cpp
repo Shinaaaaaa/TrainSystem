@@ -122,24 +122,27 @@ void Init(){
 void add_user(std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(9) , ' ');
-    string cur_user , username , password , name , mailAddress;
+    String<21> username , cur_user;
+    String<31> password;
+    String<20> name;
+    String<31> mailAddress;
     int pri;
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
             case 'c':
-                cur_user = tmp[i + 1];
+                cur_user = String<21> (tmp[i + 1]);
                 break;
             case 'u':
-                username = tmp[i + 1];
+                username = String<21> (tmp[i + 1]);
                 break;
             case 'p':
-                password = tmp[i + 1];
+                password = String<31> (tmp[i + 1]);
                 break;
             case 'n':
-                name = tmp[i + 1];
+                name = String<20> (tmp[i + 1]);
                 break;
             case 'm':
-                mailAddress = tmp[i + 1];
+                mailAddress = String<31> (tmp[i + 1]);
                 break;
             default:{
                 stringstream in;
@@ -151,15 +154,15 @@ void add_user(std::string &cmd){
     }
 
     if (userSystem.empty()) { //判断是否为第一个用户
-        User u(String<21>(username) , String<31>(password) , String<20>(name) , String<31>(mailAddress) , 10 , 0);
+        User u(username , password , name , mailAddress , 10 , 0);
         userSystem.add_user(u);
         std::cout << 0 << "\n";
     }
     else {
-        if (user_Online.find(String<21> (cur_user)) == user_Online.end()) throw "error (no login)";
-        int cur_pri = user_Online[String<21> (cur_user)];
+        if (user_Online.find(cur_user) == user_Online.end()) throw "error (no login)";
+        int cur_pri = user_Online[cur_user];
         if (cur_pri <= pri) throw "error (pri)";
-        User u(String<21>(username) , String<31>(password) , String<20>(name) , String<31>(mailAddress) , pri , 0);
+        User u(username , password , name , mailAddress , pri , 0);
         userSystem.add_user(u);
         std::cout << 0 << "\n";
     }
@@ -168,48 +171,49 @@ void add_user(std::string &cmd){
 void login(std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(6) , ' ');
-    string username , password;
+    String<21> username;
+    String<31> password;
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
             case 'u':
-                username = tmp[i + 1];
+                username = String<21> (tmp[i + 1]);
                 break;
             default:
-                password = tmp[i + 1];
+                password = String<31> (tmp[i + 1]);
                 break;
         }
     }
-    userSystem.login(String<21> (username) , String<31> (password));
+    userSystem.login(username , password);
     std::cout << 0 << "\n";
 }
 
 void logout(std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(7) , ' ');
-    string username = tmp[1];
-    userSystem.logout(String<21> (username));
+    String<21> username(tmp[1]);
+    userSystem.logout(username);
     std::cout << 0 << "\n";
 }
 
 void query_profile(std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(14) , ' ');
-    string cur_user , username;
+    String<21> cur_user , username;
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
             case 'c':
-                cur_user = tmp[i + 1];
+                cur_user = String<21> (tmp[i + 1]);
                 break;
             default:
-                username = tmp[i + 1];
+                username = String<21> (tmp[i + 1]);
                 break;
         }
     }
-    if (user_Online.find(String<21> (cur_user)) == user_Online.end()) throw "error";
-    int cur_pri = user_Online[String<21> (cur_user)];
+    if (user_Online.find(cur_user) == user_Online.end()) throw "error";
+    int cur_pri = user_Online[cur_user];
     vector<User> container;
     container.clear();
-    container = userSystem.find(String<21> (username));
+    container = userSystem.find(username);
     if (container.empty()) throw "error";
     User q_user = container[0];
     if (cur_pri > q_user.getPrivilege() || cur_user == username){
@@ -221,24 +225,27 @@ void query_profile(std::string &cmd){
 void modify_profile(std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(15) , ' ');
-    string cur_user , username , password , name , mailAddress;
+    String<21> cur_user , username;
+    String<31> password;
+    String<20> name;
+    String<31> mailAddress;
     int pri = -1;
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
             case 'c':
-                cur_user = tmp[i + 1];
+                cur_user = String<21> (tmp[i + 1]);
                 break;
             case 'u':
-                username = tmp[i + 1];
+                username = String<21> (tmp[i + 1]);
                 break;
             case 'p':
-                password = tmp[i + 1];
+                password = String<31> (tmp[i + 1]);
                 break;
             case 'n':
-                name = tmp[i + 1];
+                name = String<20> (tmp[i + 1]);
                 break;
             case 'm':
-                mailAddress = tmp[i + 1];
+                mailAddress = String<31> (tmp[i + 1]);
                 break;
             case 'g':{
                 stringstream in;
@@ -248,16 +255,16 @@ void modify_profile(std::string &cmd){
             }
         }
     }
-    if (user_Online.find(String<21> (cur_user)) == user_Online.end()) throw "error";
-    int cur_pri = user_Online[String<21> (cur_user)];
+    if (user_Online.find(cur_user) == user_Online.end()) throw "error";
+    int cur_pri = user_Online[cur_user];
     vector<User> container;
     container.clear();
-    container = userSystem.find(String<21> (username));
+    container = userSystem.find(username);
     if (container.empty()) throw "error";
     User m_user = container[0];
     if (pri != -1 && cur_pri <= pri) throw "error";
     if (cur_pri > m_user.getPrivilege() || cur_user == username){
-        userSystem.modify_user(m_user , String<31> (password) , String<20> (name) , String<31> (mailAddress) , pri);
+        userSystem.modify_user(m_user , password , name , mailAddress , pri);
     }
     else throw "error";
 }
@@ -265,13 +272,14 @@ void modify_profile(std::string &cmd){
 void add_train(std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(10) , ' ');
-    string trainID ,stations , prices , startTime , travelTimes , stopoverTimes , saleDate , type;
+    String<21> trainID;
+    string stations , prices , startTime , travelTimes , stopoverTimes , saleDate , type;
     int stationNum , seatNum;
     date StartTime{};
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
             case 'i':
-                trainID = tmp[i + 1];
+                trainID = String<21> (tmp[i + 1]);
                 break;
             case 'n': {
                 stringstream in;
@@ -374,10 +382,10 @@ void add_train(std::string &cmd){
     in.clear();
     date saleEnd(mon , d , 0 , 0);
 
-    Train t(String<21> (trainID) , Stations , stationNum , seatNum , Prices , char (type[0]) , TravelTimes , StopoverTimes , StartTime , saleStart , saleEnd , 0);
+    Train t(trainID , Stations , stationNum , seatNum , Prices , char (type[0]) , TravelTimes , StopoverTimes , StartTime , saleStart , saleEnd , 0);
     trainSystem.addTrain(t);
     int dayCount = saleEnd - saleStart;
-    trainSystem.addTrainSeat(String<21> (trainID) , seatNum , dayCount);
+    trainSystem.addTrainSeat(trainID , seatNum , dayCount);
     std::cout << 0 << "\n";
 }
 
@@ -397,12 +405,13 @@ void release_train(std::string &cmd){
 void query_train(std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(12) , ' ');
-    string trainID , Time;
+    String<21> trainID;
+    string Time;
     date time{};
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
             case 'i':
-                trainID = tmp[i + 1];
+                trainID = String<21> (tmp[i + 1]);
                 break;
             default: {
                 Time = tmp[i + 1];
@@ -418,7 +427,7 @@ void query_train(std::string &cmd){
             }
         }
     }
-    vector<Train> exist_train = trainSystem.findTrain(String<21>(trainID));
+    vector<Train> exist_train = trainSystem.findTrain(trainID);
     if (exist_train.empty()) throw "no findTrain";
     Train q_train = exist_train[0];
     trainSystem.queryTrain(q_train , time);
@@ -582,16 +591,17 @@ void query_transfer(const std::string &cmd){
 void buy_ticket(const std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(11) , ' ');
-    string username , trainID , Time , st , ed;
+    String<21> username , trainID;
+    string Time , st , ed;
     int num , isQue = 0; // 0 for false ; 1 for true
     date time{};
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
             case 'u':
-                username = tmp[i + 1];
+                username = String<21> (tmp[i + 1]);
                 break;
             case 'i':
-                trainID = tmp[i + 1];
+                trainID = String<21> (tmp[i + 1]);
                 break;
             case 'd':{
                 Time = tmp[i + 1];
@@ -626,10 +636,10 @@ void buy_ticket(const std::string &cmd){
             }
         }
     }
-    if (user_Online.find(String<21> (username)) == user_Online.end()) throw "error (no login)";
+    if (user_Online.find(username) == user_Online.end()) throw "error (no login)";
     if (num <= 0) throw "error";
-    int no = userSystem.user_addOrderNum(String<21> (username));
-    ticketSystem.buyTicket(String<21> (username) , String<21> (trainID) , String<40> (st) , String<40> (ed) , time , num , isQue , no);
+    int no = userSystem.user_addOrderNum(username);
+    ticketSystem.buyTicket(username , trainID , String<40> (st) , String<40> (ed) , time , num , isQue , no);
 }
 
 void query_order(const std::string &cmd){
@@ -651,12 +661,12 @@ void query_order(const std::string &cmd){
 void refund_ticket(const std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(14) , ' ');
-    string username;
+    String<21> username;
     int num = 1;
     for (int i = 0 ; i < tmp.size() ; i += 2){
         switch (tmp[i][1]) {
             case 'u':
-                username = tmp[i + 1];
+                username = String<21> (tmp[i + 1]);
                 break;
             default:{
                 stringstream in;
@@ -666,18 +676,18 @@ void refund_ticket(const std::string &cmd){
             }
         }
     }
-    if (user_Online.find(String<21> (username)) == user_Online.end()) throw "error (no login)";
-    vector<Order> exist_Order = orderSystem.findOrder(String<21> (username));
+    if (user_Online.find(username) == user_Online.end()) throw "error (no login)";
+    vector<Order> exist_Order = orderSystem.findOrder(username);
     if (exist_Order.empty()) throw "error";
     exist_Order.sort();
     if (num > exist_Order.size() || num <= 0) throw "error";
     Order r_order = exist_Order[exist_Order.size() - num];
     if (r_order.getStatus() == 1){
-        orderSystem.refundOrder(String<21> (username) , r_order);
-        ticketSystem.que_BuyTicket(String<21> (username) , r_order);//username没用
+        orderSystem.refundOrder(username , r_order);
+        ticketSystem.que_BuyTicket(username , r_order);//username没用
     }
     else if (r_order.getStatus() == 2){
-        orderSystem.refundOrder(String<21> (username) , r_order);
+        orderSystem.refundOrder(username , r_order);
     }
     else throw "error";
     cout << 0 << "\n";
