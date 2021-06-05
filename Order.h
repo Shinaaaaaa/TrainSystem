@@ -49,7 +49,7 @@ public:
 
 class Order_Control{
 private:
-    BPlusTree<String<21> , Order> userOrders_BPT;
+    BPlusTree<int , Order> userOrders_BPT;
     BPlusTree<pair<String<21> , int> , pair<int , Order>> pendingOrder;
 
 public:

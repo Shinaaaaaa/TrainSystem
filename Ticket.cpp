@@ -69,12 +69,12 @@ void Ticket_Control::restart() {
 }
 
 vector<Ticket> Ticket_Control::find(const String<40> &trainID) {
-    vector<Ticket> tmp = ticket_BPT.find(trainID);
+    vector<Ticket> tmp = ticket_BPT.find(trainID.hash_value);
     return tmp;
 }
 
 void Ticket_Control::addTicket(const String<40> &station, const Ticket &t) {
-    ticket_BPT.insert(station , t);
+    ticket_BPT.insert(station.hash_value , t);
 }
 
 void Ticket_Control::addTicket(const Train &t) {
@@ -87,7 +87,7 @@ void Ticket_Control::addTicket(const Train &t) {
 }
 
 void Ticket_Control::delTicket(const String<40> &station, const Ticket &t) {
-    ticket_BPT.erase(station , t);
+    ticket_BPT.erase(station.hash_value , t);
 }
 
 void Ticket_Control::buyTicket(const String<21> &username, const String<21> &trainID, const String<40> &st, const String<40> &ed,
@@ -156,8 +156,8 @@ void Ticket_Control::que_BuyTicket(const String<21> &username , const Order &ref
 }
 
 void Ticket_Control::queryTransfer(const String<40> &st , const String<40> &ed , const date &d , int type) {
-    vector<Ticket> start_station = ticket_BPT.find(st);
-    vector<Ticket> end_station = ticket_BPT.find(ed);
+    vector<Ticket> start_station = ticket_BPT.find(st.hash_value);
+    vector<Ticket> end_station = ticket_BPT.find(ed.hash_value);
     start_station.sort();
     end_station.sort();
 
@@ -183,7 +183,7 @@ void Ticket_Control::queryTransfer(const String<40> &st , const String<40> &ed ,
 
                 vector<Ticket> trans_station;
                 trans_station.clear();
-                trans_station = ticket_BPT.find(firstTrain.Stations[j]);
+                trans_station = ticket_BPT.find(firstTrain.Stations[j].hash_value);
                 trans_station.sort();
 
                 vector<pair<Ticket , Ticket>> ans;
