@@ -49,8 +49,8 @@ public:
 
 class Order_Control{
 private:
-    BPlusTree<int , Order , 50 , 0> userOrders_BPT;
-    BPlusTree<pair<int , int> , pair<int , Order> , 50 , 0> pendingOrder;
+    BPlusTree<int , Order> userOrders_BPT;
+    BPlusTree<pair<int , int> , pair<int , Order>> pendingOrder;
 
 public:
     Order_Control(){

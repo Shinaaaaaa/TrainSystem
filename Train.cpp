@@ -181,33 +181,11 @@ int Train_Control::addPendingOrderNum(const String<21> &trainID  , int no) {
 }
 
 //TODO—————————————————about TrainSeat———————————————————//
-vector<Train_Seat> Train_Control::findSeat(const String<21> &trainID , int no) {
-    vector<Train_Seat> tmp = trainSeat_BPT.find(make_pair(trainID.hash_value , no));
-    return tmp;
-}
-
 int Train_Control::getSeatNum(const String<21> &trainID , int st , int ed , int no) {
     vector<Train_Seat> tmp = trainSeat_BPT.find(make_pair(trainID.hash_value , no));
     Train_Seat t_train = tmp[0];
     int ans = 1e9 + 7;
     for (int i = st ; i < ed ; ++i){
-        ans = min(t_train.seat[i] , ans);
-    }
-    return ans;
-}
-
-int Train_Control::getSeatNum(const String<21> &trainID, const String<40> &st, const String<40> &ed, int no) {
-    vector<Train> tmp = trainID_BPT.find(trainID.hash_value);
-    Train t = tmp[0];
-    int s = 0 , e = 0;
-    for (int i = 1 ; i <= t.StationNum ; ++i){
-        if (t.Stations[i] == st) s = i;
-        else if (t.Stations[i] == ed) e = i;
-    }
-    vector<Train_Seat> tmp2 = trainSeat_BPT.find(make_pair(trainID.hash_value , no));
-    Train_Seat t_train = tmp2[0];
-    int ans = 1e9 + 7;
-    for (int i = s ; i < e ; ++i){
         ans = min(t_train.seat[i] , ans);
     }
     return ans;
@@ -228,7 +206,10 @@ void Train_Control::modifySeat(const String<21> &trainID , const String<40> &st 
     int s = 0 , e = 0;
     for (int i = 1 ; i <= t.StationNum ; ++i){
         if (t.Stations[i] == st) s = i;
-        else if (t.Stations[i] == ed) e = i;
+        else if (t.Stations[i] == ed) {
+            e = i;
+            break;
+        }
     }
     vector<Train_Seat> tmp2 = trainSeat_BPT.find(make_pair(trainID.hash_value , no));
     Train_Seat t_train = tmp2[0];

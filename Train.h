@@ -63,9 +63,9 @@ public:
 
 class Train_Control{
 private:
-    BPlusTree<int , Train , 50 , 0> trainID_BPT;
-    BPlusTree<pair<int , int> , Train_Seat , 50 , 0>  trainSeat_BPT;// pair<trainID , 车次> —— seat
-    BPlusTree<int , int , 50 , 0> trainPendingNum_BPT;
+    BPlusTree<int , Train> trainID_BPT;
+    BPlusTree<pair<int , int> , Train_Seat>  trainSeat_BPT;// pair<trainID , 车次> —— seat
+    BPlusTree<int , int> trainPendingNum_BPT;
 
 public:
     Train_Control(){
@@ -85,9 +85,5 @@ public:
     int getSeatNum(const String<21> &trainID , int st , int ed , int no);
     void modifySeat(const String<21> &trainID , int st , int ed , int no , int changeNum);
     void modifySeat(const String<21> &trainID ,const String<40> &st , const String<40> &ed , int no , int changeNum);
-
-    //TODO delete
-    vector<Train_Seat> findSeat(const String<21> &trainID , int no);
-    int getSeatNum(const String<21> &trainID ,const String<40> &st , const String<40> &ed , int no);
 };
 #endif //TRAINSTATION_TRAIN_H

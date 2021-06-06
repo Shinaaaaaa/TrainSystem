@@ -93,7 +93,10 @@ void Ticket_Control::buyTicket(const String<21> &username, const String<21> &tra
     int s = 0 , e = 0;
     for (int i = 1 ; i <= t.StationNum ; ++i){
         if (t.Stations[i] == st) s = i;
-        else if (t.Stations[i] == ed) e = i;
+        else if (t.Stations[i] == ed) {
+            e = i;
+            break;
+        }
     }
     date salebegin = t.SaleDate_begin + t.StartDayTime + date(0,0,0,t.TravelTimeSum[s] + t.StopoverTimeSum[s]);
     date saleend = t.SaleDate_end + t.StartDayTime + date(0,0,0,t.TravelTimeSum[s] + t.StopoverTimeSum[s]);
@@ -142,7 +145,10 @@ void Ticket_Control::que_BuyTicket(const String<21> &username , const Order &ref
         int s = 0 , e = 0;
         for (int j = 1 ; j <= train.StationNum ; ++j){
             if (train.Stations[j] == o.From) s = j;
-            if (train.Stations[j] == o.To) e = j;
+            if (train.Stations[j] == o.To) {
+                e = j;
+                break;
+            }
         }
         int left = trainSystem.getSeatNum(o.TrainID , s , e , o.StationNo);
         if (left <= 0) break;
