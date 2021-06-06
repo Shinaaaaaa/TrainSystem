@@ -132,7 +132,7 @@ void Ticket_Control::buyTicket(const String<21> &username, const String<21> &tra
 }
 
 void Ticket_Control::que_BuyTicket(const String<21> &username , const Order &refund_o) {// 候补队列购票
-    vector<pair<int , Order>> tmp = orderSystem.findPendingOrder(make_pair(refund_o.TrainID , refund_o.StationNo));
+    vector<pair<int , Order>> tmp = orderSystem.findPendingOrder(make_pair(refund_o.TrainID.hash_value , refund_o.StationNo));
     tmp.sort();
     for (int i = 0 ; i < tmp.size() ; ++i){
         pair<int , Order> t = tmp[i];
@@ -145,6 +145,7 @@ void Ticket_Control::que_BuyTicket(const String<21> &username , const Order &ref
             if (train.Stations[j] == o.To) e = j;
         }
         int left = trainSystem.getSeatNum(o.TrainID , s , e , o.StationNo);
+        if (left <= 0) break;
         if (o.TicketNum <= left) {
             trainSystem.modifySeat(o.TrainID , s , e , o.StationNo , o.TicketNum);
             orderSystem.delPendingOrder(o , o.StationNo , t.first);

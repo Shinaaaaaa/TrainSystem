@@ -7,7 +7,6 @@
 #include "String.hpp"
 #include "Map.hpp"
 #include "BPT.hpp"
-#include <unordered_map>
 using namespace RA;
 
 class User;
@@ -33,8 +32,8 @@ public:
 
 class User_Control{
 private:
-    BPlusTree<int , User> username_BPT;//username——User BPT:储存用户信息
-    BPlusTree<int , int> userOrderNum;
+    BPlusTree<int , User , 110 , 0> username_BPT;//username——User BPT:储存用户信息
+    BPlusTree<int , int , 110 , 0> userOrderNum;
 
 public:
     User_Control(){

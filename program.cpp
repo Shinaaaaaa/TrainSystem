@@ -15,7 +15,7 @@ Train_Control trainSystem;
 Ticket_Control ticketSystem;
 Order_Control orderSystem;
 
-extern std::unordered_map<int , int> user_Online;//username —— pri: map
+extern map<int , int> user_Online;//username —— pri: map
 
 //TODO 语句处理(含一个参数)
 vector<string> Split(const std::string &cmd , char p){
@@ -215,9 +215,8 @@ void query_profile(std::string &cmd){
     container.clear();
     container = userSystem.find(username);
     if (container.empty()) throw "error";
-    User q_user = container[0];
-    if (cur_pri > q_user.getPrivilege() || cur_user == username){
-        userSystem.show_inf_user(q_user);
+    if (cur_pri > container[0].getPrivilege() || cur_user == username){
+        userSystem.show_inf_user(container[0]);
     }
     else throw "error";
 }
@@ -261,10 +260,9 @@ void modify_profile(std::string &cmd){
     container.clear();
     container = userSystem.find(username);
     if (container.empty()) throw "error";
-    User m_user = container[0];
     if (pri != -1 && cur_pri <= pri) throw "error";
-    if (cur_pri > m_user.getPrivilege() || cur_user == username){
-        userSystem.modify_user(m_user , password , name , mailAddress , pri);
+    if (cur_pri > container[0].getPrivilege() || cur_user == username){
+        userSystem.modify_user(container[0] , password , name , mailAddress , pri);
     }
     else throw "error";
 }
@@ -426,8 +424,7 @@ void query_train(std::string &cmd){
     }
     vector<Train> exist_train = trainSystem.findTrain(trainID);
     if (exist_train.empty()) throw "no findTrain";
-    Train q_train = exist_train[0];
-    trainSystem.queryTrain(q_train , time);
+    trainSystem.queryTrain(exist_train[0] , time);
 }
 
 void delete_train(std::string &cmd){
