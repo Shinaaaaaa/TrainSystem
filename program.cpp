@@ -15,7 +15,7 @@ Train_Control trainSystem;
 Ticket_Control ticketSystem;
 Order_Control orderSystem;
 
-extern map<String<21> , int> user_Online;//username —— pri: map
+extern std::unordered_map<int , int> user_Online;//username —— pri: map
 
 //TODO 语句处理(含一个参数)
 vector<string> Split(const std::string &cmd , char p){
@@ -159,8 +159,8 @@ void add_user(std::string &cmd){
         std::cout << 0 << "\n";
     }
     else {
-        if (user_Online.find(cur_user) == user_Online.end()) throw "error (no login)";
-        int cur_pri = user_Online[cur_user];
+        if (user_Online.find(cur_user.hash_value) == user_Online.end()) throw "error (no login)";
+        int cur_pri = user_Online[cur_user.hash_value];
         if (cur_pri <= pri) throw "error (pri)";
         User u(username , password , name , mailAddress , pri);
         userSystem.add_user(u);
@@ -209,8 +209,8 @@ void query_profile(std::string &cmd){
                 break;
         }
     }
-    if (user_Online.find(cur_user) == user_Online.end()) throw "error";
-    int cur_pri = user_Online[cur_user];
+    if (user_Online.find(cur_user.hash_value) == user_Online.end()) throw "error";
+    int cur_pri = user_Online[cur_user.hash_value];
     vector<User> container;
     container.clear();
     container = userSystem.find(username);
@@ -255,8 +255,8 @@ void modify_profile(std::string &cmd){
             }
         }
     }
-    if (user_Online.find(cur_user) == user_Online.end()) throw "error";
-    int cur_pri = user_Online[cur_user];
+    if (user_Online.find(cur_user.hash_value) == user_Online.end()) throw "error";
+    int cur_pri = user_Online[cur_user.hash_value];
     vector<User> container;
     container.clear();
     container = userSystem.find(username);
@@ -562,7 +562,7 @@ void buy_ticket(const std::string &cmd){
             }
         }
     }
-    if (user_Online.find(username) == user_Online.end()) throw "error (no login)";
+    if (user_Online.find(username.hash_value) == user_Online.end()) throw "error (no login)";
     if (num <= 0) throw "error";
     int no = userSystem.user_addOrderNum(username);
     ticketSystem.buyTicket(username , trainID , String<40> (st) , String<40> (ed) , time , num , isQue , no);
@@ -572,7 +572,7 @@ void query_order(const std::string &cmd){
     vector<string> tmp;
     tmp = Split(cmd.substr(12) , ' ');
     String<21> username(tmp[1]);
-    if (user_Online.find(username) == user_Online.end()) throw "error";
+    if (user_Online.find(username.hash_value) == user_Online.end()) throw "error";
     vector<Order> exist_Order = orderSystem.findOrder(username);
     if (exist_Order.empty()) cout << 0 << "\n";
     else {
@@ -602,7 +602,7 @@ void refund_ticket(const std::string &cmd){
             }
         }
     }
-    if (user_Online.find(username) == user_Online.end()) throw "error (no login)";
+    if (user_Online.find(username.hash_value) == user_Online.end()) throw "error (no login)";
     vector<Order> exist_Order = orderSystem.findOrder(username);
     if (exist_Order.empty()) throw "error";
     exist_Order.sort();

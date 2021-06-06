@@ -7,6 +7,7 @@
 #include "String.hpp"
 #include "Map.hpp"
 #include "BPT.hpp"
+#include <unordered_map>
 using namespace RA;
 
 class User;

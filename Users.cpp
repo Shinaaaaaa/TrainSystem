@@ -4,7 +4,7 @@
 #include "Users.h"
 using namespace RA;
 
-map<String<21> , int> user_Online;
+std::unordered_map<int , int> user_Online;
 
 //TODO———————————————————————————————————————————class  user——————————————————————————————————————————————————————————//
 User::User() = default;
@@ -60,7 +60,7 @@ void User_Control::add_user(User &u) {
 }
 
 void User_Control::login(const String<21> &u , const String<31> &p){
-    auto it = user_Online.find(u);
+    auto it = user_Online.find(u.hash_value);
     if (it != user_Online.end()) throw "error (have login)";
     vector<User> user_exist;
     user_exist = username_BPT.find(u.hash_value);
@@ -69,11 +69,11 @@ void User_Control::login(const String<21> &u , const String<31> &p){
     }
     User U = user_exist[0];
     if (U.password != p) throw "wrong password";
-    user_Online.insert(make_pair(u , U.privilege));
+    user_Online.insert(make_pair(u.hash_value , U.privilege));
 }
 
 void User_Control::logout(const String<21> &u) {
-    auto it = user_Online.find(u);
+    auto it = user_Online.find(u.hash_value);
     if (it == user_Online.end()) throw "error (no login)";
     user_Online.erase(it);
 }
@@ -89,8 +89,8 @@ void User_Control::modify_user(const User &m_user , const String<31> &p, const S
     if (m == "") tmp.mailAddress = m_user.mailAddress;
     if (pri == -1) tmp.privilege = m_user.privilege;
     else {
-        if (user_Online.find(m_user.username) != user_Online.end()){
-            user_Online[m_user.username] = pri;
+        if (user_Online.find(m_user.username.hash_value) != user_Online.end()){
+            user_Online[m_user.username.hash_value] = pri;
         }
     }
     username_BPT.modify(m_user.username.hash_value , m_user , tmp);
