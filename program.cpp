@@ -2,7 +2,6 @@
 // Created by lenovo on 2021/4/26.
 //
 #include <iostream>
-#include <sstream>
 #include "program.h"
 #include "BPT.hpp"
 #include "Users.h"
@@ -30,6 +29,14 @@ vector<string> Split(const std::string &cmd , char p){
     }
     tmp.push_back(t);
     return tmp;
+}
+
+int string_To_int(const std::string &s){
+    int sum = 0;
+    for (int i = 0 ; i < s.length() ; ++i){
+        sum = sum * 10 + s[i] - '0';
+    }
+    return sum;
 }
 
 void Run(std::string &command){
@@ -145,9 +152,7 @@ void add_user(std::string &cmd){
                 mailAddress = String<31> (tmp[i + 1]);
                 break;
             default:{
-                stringstream in;
-                in << tmp[i + 1];
-                in >> pri;
+                pri = string_To_int(tmp[i + 1]);
                 break;
             }
         }
@@ -247,9 +252,7 @@ void modify_profile(std::string &cmd){
                 mailAddress = String<31> (tmp[i + 1]);
                 break;
             case 'g':{
-                stringstream in;
-                in << tmp[i + 1];
-                in >> pri;
+                pri = string_To_int(tmp[i + 1]);
                 break;
             }
         }
@@ -280,15 +283,11 @@ void add_train(std::string &cmd){
                 trainID = String<21> (tmp[i + 1]);
                 break;
             case 'n': {
-                stringstream in;
-                in << tmp[i + 1];
-                in >> stationNum;
+                stationNum = string_To_int(tmp[i + 1]);
                 break;
             }
             case 'm':{
-                stringstream in;
-                in << tmp[i + 1];
-                in >> seatNum;
+                seatNum = string_To_int(tmp[i + 1]);
                 break;
             }
             case 's':
@@ -301,10 +300,8 @@ void add_train(std::string &cmd){
                 startTime = tmp[i + 1];
                 vector<string> s = Split(startTime , ':');
                 int h , m;
-                stringstream in;
-                in << s[0] ; in >> h;
-                in.clear();
-                in << s[1] ; in >> m;
+                h = string_To_int(s[0]);
+                m = string_To_int(s[1]);
                 StartTime.reset(0 , 0 , h , m);
                 break;
             }
@@ -333,9 +330,7 @@ void add_train(std::string &cmd){
     tmp = Split(prices , '|');
     Prices[1] = 0;
     for (int i = 0 ; i < tmp.size() ; ++i){
-        stringstream in;
-        in << tmp[i];
-        in >> Prices[i + 2];
+        Prices[i + 2] = string_To_int(tmp[i]);
         Prices[i + 2] += Prices[i + 1];
     }
     tmp.clear();
@@ -343,9 +338,7 @@ void add_train(std::string &cmd){
     tmp = Split(travelTimes , '|');
     TravelTimes[0] = TravelTimes[1] = 0;
     for (int i = 0 ; i < tmp.size() ; ++i){
-        stringstream in;
-        in << tmp[i];
-        in >> TravelTimes[i + 2];
+        TravelTimes[i + 2] = string_To_int(tmp[i]);
         TravelTimes[i + 2] += TravelTimes[i + 1];
     }
     tmp.clear();
@@ -354,9 +347,7 @@ void add_train(std::string &cmd){
     if (stationNum != 2){
         tmp = Split(stopoverTimes , '|');
         for (int i = 0 ; i < tmp.size() ; ++i){
-            stringstream in;
-            in << tmp[i];
-            in >> StopoverTimes[i + 2];
+            StopoverTimes[i + 2] = string_To_int(tmp[i]);
             StopoverTimes[i + 2] += StopoverTimes[i + 1];
         }
     }
@@ -366,18 +357,13 @@ void add_train(std::string &cmd){
     string sale_start = tmp[0] , sale_end = tmp[1];
     vector<string> s;
     int mon , d;
-    stringstream in;
     s = Split(sale_start , '-');
-    in << s[0] ; in >> mon;
-    in.clear();
-    in << s[1] ; in >> d;
-    in.clear();
+    mon = string_To_int(s[0]);
+    d = string_To_int(s[1]);
     date saleStart(mon , d , 0 , 0);
     s = Split(sale_end , '-');
-    in << s[0] ; in >> mon;
-    in.clear();
-    in << s[1] ; in >> d;
-    in.clear();
+    mon = string_To_int(s[0]);
+    d = string_To_int(s[1]);
     date saleEnd(mon , d , 0 , 0);
     Train t(trainID , Stations , stationNum , seatNum , Prices , char (type[0]) , TravelTimes , StopoverTimes , StartTime , saleStart , saleEnd , 0);
     trainSystem.addTrain(t);
@@ -411,12 +397,7 @@ void query_train(std::string &cmd){
             default: {
                 Time = tmp[i + 1];
                 vector<string> s = Split(Time , '-');
-                int M , d;
-                stringstream in;
-                in << s[0] ; in >> M;
-                in.clear();
-                in << s[1] ; in >> d;
-                in.clear();
+                int M = string_To_int(s[0]) , d = string_To_int(s[1]);
                 time.reset(M , d , 0 , 0);
                 break;
             }
@@ -452,12 +433,7 @@ void query_ticket(const std::string &cmd){
             case 'd': {
                 Time = tmp[i + 1];
                 vector<string> s = Split(Time , '-');
-                int M , d;
-                stringstream in;
-                in << s[0] ; in >> M;
-                in.clear();
-                in << s[1] ; in >> d;
-                in.clear();
+                int M = string_To_int(s[0]) , d = string_To_int(s[1]);
                 q_time.reset(M , d , 0 , 0);
                 break;
             }
@@ -492,12 +468,7 @@ void query_transfer(const std::string &cmd){
             case 'd': {
                 Time = tmp[i + 1];
                 vector<string> s = Split(Time , '-');
-                int M , d;
-                stringstream in;
-                in << s[0] ; in >> M;
-                in.clear();
-                in << s[1] ; in >> d;
-                in.clear();
+                int M = string_To_int(s[0]) , d = string_To_int(s[1]);
                 q_time.reset(M , d , 0 , 0);
                 break;
             }
@@ -529,19 +500,12 @@ void buy_ticket(const std::string &cmd){
             case 'd':{
                 Time = tmp[i + 1];
                 vector<string> s = Split(Time , '-');
-                int M , d;
-                stringstream in;
-                in << s[0] ; in >> M;
-                in.clear();
-                in << s[1] ; in >> d;
-                in.clear();
+                int M = string_To_int(s[0]) , d = string_To_int(s[1]);
                 time.reset(M , d , 0 , 0);
                 break;
             }
             case 'n':{
-                stringstream in;
-                in << tmp[i + 1];
-                in >> num;
+                num = string_To_int(tmp[i + 1]);
                 break;
             }
             case 'f':{
@@ -592,9 +556,7 @@ void refund_ticket(const std::string &cmd){
                 username = String<21> (tmp[i + 1]);
                 break;
             default:{
-                stringstream in;
-                in << tmp[i + 1];
-                in >> num;
+                num = string_To_int(tmp[i + 1]);
                 break;
             }
         }
