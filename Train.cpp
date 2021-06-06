@@ -7,7 +7,7 @@
 //TODO——————————————————————————————————————————Train类函数————————————————————————————————————————————————————————————//
 Train::Train(const String<21> &trainId, String<40> *stations, int stationNum, int seatNum, const int *priceSum, char type,
              const int *travelTimeSum, const int *stopoverTimeSum, const date &startDayTime, const date &saleDateBegin,
-             const date &saleDateEnd , int isRelease = 0){
+             const date &saleDateEnd , const StationHashArray &stationHash, int isRelease = 0){
     TrainID = trainId;
     StationNum = stationNum;
     SeatNum = seatNum;
@@ -19,6 +19,7 @@ Train::Train(const String<21> &trainId, String<40> *stations, int stationNum, in
     for (int i = 2 ; i <= stationNum ; ++i) PriceSum[i] = priceSum[i];
     for (int i = 2 ; i <= stationNum ; ++i) TravelTimeSum[i] = travelTimeSum[i];
     for (int i = 2 ; i < stationNum ; ++i) StopoverTimeSum[i] = stopoverTimeSum[i];
+    StationHash = stationHash;
     IsRelease = isRelease;
 }
 
@@ -35,6 +36,7 @@ Train &Train::operator=(const Train &t) {
     for (int i = 2 ; i <= StationNum ; ++i) PriceSum[i] = t.PriceSum[i];
     for (int i = 2 ; i <= StationNum ; ++i) TravelTimeSum[i] = t.TravelTimeSum[i];
     for (int i = 2 ; i < StationNum ; ++i) StopoverTimeSum[i] = t.StopoverTimeSum[i];
+    StationHash = t.StationHash;
     IsRelease = t.IsRelease;
     return *this;
 }

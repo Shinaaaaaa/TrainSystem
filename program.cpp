@@ -321,10 +321,16 @@ void add_train(std::string &cmd){
     }
     String<40> Stations[stationNum + 1];
     int Prices[stationNum + 1] , TravelTimes[stationNum + 1] , StopoverTimes[stationNum];
+
     tmp.clear();
     //处理车站
     tmp = Split(stations , '|');
-    for (int i = 0 ; i < tmp.size() ; ++i) Stations[i + 1] = String<40> (tmp[i]);
+    pair<int , int> hash[stationNum + 1];
+    for (int i = 0 ; i < tmp.size() ; ++i) {
+        Stations[i + 1] = String<40> (tmp[i]);
+        hash[i + 1] = make_pair(Stations[i + 1].hash_value , i + 1);
+    }
+    StationHashArray stationHash(hash , stationNum);
     tmp.clear();
     //处理票价
     tmp = Split(prices , '|');
@@ -365,7 +371,7 @@ void add_train(std::string &cmd){
     mon = string_To_int(s[0]);
     d = string_To_int(s[1]);
     date saleEnd(mon , d , 0 , 0);
-    Train t(trainID , Stations , stationNum , seatNum , Prices , char (type[0]) , TravelTimes , StopoverTimes , StartTime , saleStart , saleEnd , 0);
+    Train t(trainID , Stations , stationNum , seatNum , Prices , char (type[0]) , TravelTimes , StopoverTimes , StartTime , saleStart , saleEnd , stationHash , 0);
     trainSystem.addTrain(t);
     std::cout << 0 << "\n";
 }
